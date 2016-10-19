@@ -15,6 +15,11 @@ En esta página se encuentra la descripción sobre la API de Spreaker: https://d
 
 #Cordova
 
+https://cordova.apache.org/
+
 Cordova permite a partir de una aplicación HTML + CSS + JAVASCRIPT crear Apps para distintas plataformas, Android, iOS, etc.
 
 Para el comportamiento Javascript se utiliza la librería cordova-jquery
+
+https://www.npmjs.com/package/cordova-jquery/tutorial
+
