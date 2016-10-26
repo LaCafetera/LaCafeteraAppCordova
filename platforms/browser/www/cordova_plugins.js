@@ -202,6 +202,30 @@ module.exports = [
         "clobbers": [
             "window.FileTransfer"
         ]
+    },
+    {
+        "file": "plugins/cordova-plugin-media/www/MediaError.js",
+        "id": "cordova-plugin-media.MediaError",
+        "pluginId": "cordova-plugin-media",
+        "clobbers": [
+            "window.MediaError"
+        ]
+    },
+    {
+        "file": "plugins/cordova-plugin-media/www/Media.js",
+        "id": "cordova-plugin-media.Media",
+        "pluginId": "cordova-plugin-media",
+        "clobbers": [
+            "window.Media"
+        ]
+    },
+    {
+        "file": "plugins/cordova-plugin-media/www/browser/Media.js",
+        "id": "cordova-plugin-media.BrowserMedia",
+        "pluginId": "cordova-plugin-media",
+        "clobbers": [
+            "window.Media"
+        ]
     }
 ];
 module.exports.metadata = 
@@ -210,7 +234,8 @@ module.exports.metadata =
     "cordova-plugin-whitelist": "1.3.0",
     "cordova-plugin-compat": "1.0.0",
     "cordova-plugin-file": "4.3.0",
-    "cordova-plugin-file-transfer": "1.6.0"
+    "cordova-plugin-file-transfer": "1.6.0",
+    "cordova-plugin-media": "2.4.0"
 }
 // BOTTOM OF METADATA
 });
