@@ -15,36 +15,11 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
- */
+
 var app = {
     // Application Constructor
     initialize: function() {
-
         this.bindEvents();
-
-
-var elementos;
-        var audio_en_rep="0";
-        var audio_lnk = document.createElement("AUDIO");
-        $.getJSON( "https://api.spreaker.com/v2/shows/1060718/episodes?limit=15", function( data ) {
-            var items = [];
-            var cadena ='';
-            var i=0;
-            elementos = data.response.items.slice();
-            elementos.forEach(function( val ) {
-                cadena = "<li class=\"episodios\" id=\"" + i++ + "\">" + val.title.substring(0, 40) + "(...)</li>";
-                $("#listado").append(cadena);
-            }); // fin de forEach
-          $("#imagen").html("<img align=\"center\" src="+elementos[0].image_url.replace("\/","/")+">");
-          //    $("#imagen").html("<p>hola</p>");
-        }); // fin de getJSON
-
-        $("#listado").delegate('.episodios','click',function(){
-            $("#imagen").html("<img align=center src="+elementos[this.id].image_url.replace("\/","/")+" >");
-            $("#imagen2").html("<img align=center src="+elementos[this.id].image_url.replace("\/","/")+" >");
-        });
-
-
     },
     // Bind Event Listeners
     //
@@ -73,4 +48,78 @@ var elementos;
     }
 };
 
-app.initialize();
+app.initialize(); */
+document.addEventListener("deviceready", onDeviceReady, false);
+
+function onDeviceReady() {
+   // as soon as this function is called File "should" be defined
+   inicializa();
+}
+
+
+   function inicializa(){
+        var elementos;
+        var audio_en_rep="0";
+        var posicion=0;
+
+        $.getJSON( "https://api.spreaker.com/v2/shows/1060718/episodes?limit=15", function( data ) {
+            var items = [];
+            var cadena ='';
+            var i=0;
+            elementos = data.response.items.slice();
+            elementos.forEach(function( val ) {
+                cadena = "<li class=\"episodios\" id=\"" + i++ + "\">" + val.title.substring(0, 30) + "(...)</li>";
+                $("#listado").append(cadena);
+            }); // fin de forEach
+            $("#imagen").html("<img align=\"center\" src="+elementos[0].image_url.replace("\/","/")+">");
+        }); // fin de getJSON
+
+        $("#listado").delegate('.episodios','click',function(){
+            posicion = this.id;
+            $("#imagen").html("<img align=center src="+elementos[posicion].image_url.replace("\/","/")+" >");
+            $("#imagen2").html("<img align=center src="+elementos[posicion].image_url.replace("\/","/")+" >");
+        }); // final click episodio
+
+        $("#descarga").click(function(){
+            episodio_id = elementos[posicion].episode_id;
+            var fileTransfer = new FileTransfer();
+            var audio_en_rep = "https://api.spreaker.com/listen/episode/"+episodio_id+"/http";
+            var uri = encodeURI(audio_en_rep);
+            var fileURL =  "///storage/sdcard/Podcasts/"+episodio_id+".mp3"; // emulador
+            //var fileURL =  "///storage/emulated/0/Podcasts/"+episodio_id+".mp3"; // móvil
+
+            fileTransfer.onprogress = function(progressEvent) {
+                if (progressEvent.lengthComputable) {
+            	    var perc = Math.floor(progressEvent.loaded / progressEvent.total * 100);
+            		$("#pctDesc").html("<p>Descargado " + perc + "%...<p>");
+            	} else {
+            	    if($("#pctDesc").html() == "") {
+            		    $("#pctDesc").html("Descargando...");
+            		} else {
+            		    $("#pctDesc").html($("#pctDesc").html()+ ".") ;
+            		}
+            	}
+            }; // fin onprogress
+
+            console.log("Comenzando la descarga del fichero "+ audio_en_rep);
+            $("#pctDesc").html("");
+            fileTransfer.download(
+                uri, fileURL, function(entry) {
+                console.log("download complete: " + entry.toURL());
+            },
+            function(error) {
+                console.log("download error source " + error.source);
+                console.log("download error target " + error.target);
+                console.log("download error code" + error.code);
+            },
+            false, {
+                headers: {
+                    "Authorization": "Basic dGVzdHVzZXJuYW1lOnRlc3RwYXNzd29yZA=="
+                }
+            })
+            alert("Descarga completa");
+        }); //fin ("#descarga").click
+    }
+
+/****************************** directorio ************************************/
+
