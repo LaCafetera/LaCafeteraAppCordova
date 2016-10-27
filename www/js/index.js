@@ -68,7 +68,7 @@ function onDeviceReady() {
             var i=0;
             elementos = data.response.items.slice();
             elementos.forEach(function( val ) {
-                cadena = "<li class=\"episodios\" id=\"" + i++ + "\">" + val.title.substring(0, 30) + "(...)</li>";
+                cadena = "<li class=\"episodios\" id=\"" + i++ + "\">" + val.title.substring(0, 50) + "</li>";
                 $("#listado").append(cadena);
             }); // fin de forEach
             $("#imagen").html("<img align=\"center\" src="+elementos[0].image_url.replace("\/","/")+">");

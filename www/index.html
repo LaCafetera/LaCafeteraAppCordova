@@ -13,8 +13,9 @@
 		-->    <meta name="format-detection" content="telephone=no">
         <meta name="msapplication-tap-highlight" content="no">
         <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
-        <link rel="stylesheet" type="text/css" href="css/index.css">
+        
 		<link rel="stylesheet" type="text/css" href="js/jquery-1.5.0.mobile.min.css">
+		<link rel="stylesheet" type="text/css" href="css/index.css">
 		<style>
 		/* For avoiding title truncation in wp8 */
 		.ui-header .ui-title {
@@ -31,25 +32,30 @@
     </head>
 
 	<body>
+
 	<div data-role="page" id="index">
-		<header data-role="header">
-			<h1>La Cafetera</h1>
+		
+		<header data-role="header" class="cabecera" style="background-color:#444444;" >
+			<img class="logo" src="img/cafetera.png" />
 		</header>
+		
 		<div data-role="content" id="imagen">
+			
 		</div>
+<p><a href="#capitulo" data-role="button" data-theme="c">Reproducir</a></p>
 		<div data-role="content">
 			<ul class = "my-new-list" id= "listado"></ul>
-			<p><a href="#capitulo" data-role="button" data-theme="c">Play</a></p>
+			
 		</div>
 
-		<footer data-role="footer">
+		<footer data-role="footer" style="background-color:#444444;" >
 			<h2>&copy; radiocable.com</h2>
 		</footer>
 	</div>
 
 	<div data-role="page" id="capitulo">
-		<header data-role="header">
-			<h1>La Cafetera</h1>
+		<header data-role="header" class="cabecera" style="background-color:#444444;" >
+			<img class="logo" src="img/cafetera.png" />
 		</header>
 
 		<div data-role="content">
@@ -59,16 +65,29 @@
 			<p id="pause"><a data-role="button" data-theme="c">Pausar</a></p>
 			<p id="descarga"><a data-role="button" data-theme="c">Descargar</a></p>
 			<p><a href="#index" data-role="button" data-theme="c">Volver a la lista</a></p>
-			<div id='pctDesc'><p>LA descarga va aquí</p></div>
+			<!--<div id='pctDesc'><p>LA descarga va aquí</p></div>-->
 		</div>
 	</div>
 	</body>
 		<!-- end page 2 -->
-<script type="text/javascript" src="cordova.js"></script><script type="text/javascript" src="js/jquery-1.11.1.min.js" id="cordova-jquery"></script><script type="text/javascript" id="jqm-trans-disable">
+<script type="text/javascript" src="cordova.js"></script>
+
+<script type="text/javascript" src="js/jquery-1.11.1.min.js" id="cordova-jquery"></script>
+
+<script type="text/javascript" id="jqm-trans-disable">
 		/* For having a faster transition */
 		$(document).on("mobileinit", function() {
 				$.mobile.defaultPageTransition = "none";
 				$.mobile.defaultDialogTransition = "none";
 		});
-		</script><script type="text/javascript" src="js/jquery-1.5.0.mobile.min.js"></script><script type="text/javascript" src="js/index.js"></script></body>
+
+		</script>
+
+<script type="text/javascript" src="js/jquery-1.5.0.mobile.min.js"></script><script type="text/javascript" src="js/index.js"></script>
+<script type="text/javascript" id="jqm-trans-disable">
+		
+inicializa();/*Esto para probar en navegadores pc*/
+
+		</script>
+</body>
 </html>
