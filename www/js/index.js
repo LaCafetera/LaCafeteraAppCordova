@@ -61,6 +61,8 @@ function onDeviceReady() {
         var elementos;
         var audio_en_rep="0";
         var posicion=0;
+        var reproductor;
+        var reproduciendo=0;
 
         $.getJSON( "https://api.spreaker.com/v2/shows/1060718/episodes?limit=15", function( data ) {
             var items = [];
@@ -78,6 +80,11 @@ function onDeviceReady() {
             posicion = this.id;
             $("#imagen").html("<img align=center src="+elementos[posicion].image_url.replace("\/","/")+" >");
             $("#imagen2").html("<img align=center src="+elementos[posicion].image_url.replace("\/","/")+" >");
+            episodio_id = elementos[posicion].episode_id;
+            audio_en_rep = "https://api.spreaker.com/listen/episode/"+episodio_id+"/http";
+            reproductor = new Media(encodeURI(audio_en_rep), function(){console.log("comenzando reproduccion")},
+                                                             function(err){console.log("Error en reproduccion" + err.code)},
+                                                             function(msg){reproduciendo = msg; console.log("Estado de la reproduccion" + reproduciendo)});
         }); // final click episodio
 
         $("#descarga").click(function(){
@@ -117,8 +124,20 @@ function onDeviceReady() {
                     "Authorization": "Basic dGVzdHVzZXJuYW1lOnRlc3RwYXNzd29yZA=="
                 }
             })
-            alert("Descarga completa");
         }); //fin ("#descarga").click
+
+
+        $("#play").click(function(){
+            if (reproduciendo == Media.MEDIA_RUNNING ) {
+                reproductor.pause();
+                $("#buttonplay").html("Reproducir") ;
+                reproduciendo = false;
+            } else {
+                reproductor.play();
+                $("#buttonplay").html("Pausa") ;
+                reproduciendo = true;
+            }
+        });
     }
 
 /****************************** directorio ************************************/
