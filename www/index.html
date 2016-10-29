@@ -1,22 +1,22 @@
 <html>
-    <head>
-        <!--
-        Customize this policy to fit your own app's needs. For more guidance, see:
-            https://github.com/apache/cordova-plugin-whitelist/blob/master/README.md#content-security-policy
-        Some notes:
-            * gap: is required only on iOS (when using UIWebView) and is needed for JS->native communication
-            * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
-            * Disables use of inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
-                * Enable inline JS: add 'unsafe-inline' to default-src
+<head>
+	<!--
+    Customize this policy to fit your own app's needs. For more guidance, see:
+        https://github.com/apache/cordova-plugin-whitelist/blob/master/README.md#content-security-policy
+    Some notes:
+        * gap: is required only on iOS (when using UIWebView) and is needed for JS->native communication
+        * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
+        * Disables use of inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
+            * Enable inline JS: add 'unsafe-inline' to default-src
 
-        <meta http-equiv="Content-Security-Policy" content="default-src &apos;self&apos; data: gap: https://ssl.gstatic.com &apos;unsafe-eval&apos;; style-src &apos;self&apos; &apos;unsafe-inline&apos;; media-src *">
-		-->    <meta name="format-detection" content="telephone=no">
-        <meta name="msapplication-tap-highlight" content="no">
-        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
-        
-		<link rel="stylesheet" type="text/css" href="js/jquery-1.5.0.mobile.min.css">
-		<link rel="stylesheet" type="text/css" href="css/index.css">
-		<style>
+    <meta http-equiv="Content-Security-Policy" content="default-src &apos;self&apos; data: gap: https://ssl.gstatic.com &apos;unsafe-eval&apos;; style-src &apos;self&apos; &apos;unsafe-inline&apos;; media-src *">
+    -->    <meta name="format-detection" content="telephone=no">
+	<meta name="msapplication-tap-highlight" content="no">
+	<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+
+	<link rel="stylesheet" type="text/css" href="js/jquery-1.5.0.mobile.min.css">
+	<link rel="stylesheet" type="text/css" href="css/index.css">
+	<style>
 		/* For avoiding title truncation in wp8 */
 		.ui-header .ui-title {
 				overflow: visible !important;
@@ -28,48 +28,54 @@
 				position: relative !important;
 		}
 		</style>
-        <title>La Cafetera</title>
-    </head>
+	<title>La Cafetera</title>
+</head>
 
-	<body>
+<body>
 
-	<div data-role="page" id="index">
-		
-		<header data-role="header" class="cabecera" style="background-color:#444444;" >
-			<img class="logo" src="img/cafetera.png" />
-		</header>
-		
-		<div data-role="content" id="imagen">
-			
-		</div>
-<p><a href="#capitulo" data-role="button" data-theme="c">Reproducir</a></p>
-		<div data-role="content">
-			<ul class = "my-new-list" id= "listado"></ul>
-			
-		</div>
+<div data-role="page" id="index">
 
-		<footer data-role="footer" style="background-color:#444444;" >
-			<h2>&copy; radiocable.com</h2>
-		</footer>
+	<header data-role="header" class="cabecera" style="background-color:#444444;" >
+		<img class="logo" src="img/cafetera.png" />
+	</header>
+
+	<div data-role="content" id="imagen">
+
 	</div>
-
-	<div data-role="page" id="capitulo">
-		<header data-role="header" class="cabecera" style="background-color:#444444;" >
-			<img class="logo" src="img/cafetera.png" />
-		</header>
-
-		<div data-role="content">
-			<div data-role="content" id="imagen2">
-			</div>
-			<p><a data-role="button" id="buttonplay" data-theme="c">Reproducir</a></p>
-			<p><a data-role="button" id="descarga" data-theme="c">Descargar</a></p>
-			<div id='pctDesc'><p></p></div>
-			<progress max="100" value="0" id="ft-prog"></progress>
-			<p><a href="#index" data-role="button" data-theme="c">Volver a la lista</a></p>
-		</div>
+	<!--<p><a href="#capitulo" data-role="button" data-theme="c">Reproducir</a></p>-->
+	<div data-role="content">
+		<ul data-role="listview" class = "my-new-list" id= "listado">
+		</ul>
 	</div>
-	</body>
-		<!-- end page 2 -->
+	<footer data-role="footer" style="background-color:#444444;" >
+		<h2>&copy; radiocable.com</h2>
+	</footer>
+</div>
+
+<div data-role="page" id="capitulo">
+	<header data-role="header" class="cabecera" style="background-color:#444444;" >
+		<img class="logo" src="img/cafetera.png" />
+	</header>
+
+	<div data-role="content">
+		<div data-role="content" id="imagen2">
+		</div>
+		<p><a data-role="button" id="buttonplay" data-theme="c">Reproducir</a></p>
+		<form>
+			<input type="range" name="slider-fill" id="slider-fill" value="0" min="0" max="100" data-highlight="true" />
+		</form>
+		<p><a data-role="button" id="descarga" data-theme="c">Descargar</a></p>
+		<div id='pctDesc'><p></p></div>
+		<!--<progress max="100" value="0" id="ft-prog"></progress>-->
+
+		<form>
+			<input type="range" name="slider-fill" id="slider-descarga" value="0" min="0" max="100" data-highlight="true" />
+		</form>
+		<p><a href="#index" data-role="button" data-theme="c">Volver a la lista</a></p>
+	</div>
+</div>
+</body>
+<!-- end page 2 -->
 <script type="text/javascript" src="cordova.js"></script>
 
 <script type="text/javascript" src="js/jquery-1.11.1.min.js" id="cordova-jquery"></script>

@@ -71,11 +71,22 @@ function onDeviceReady() {
             var i=0;
             elementos = data.response.items.slice();
             elementos.forEach(function( val ) {
-                cadena = "<li class=\"episodios\" id=\"" + i++ + "\">" + val.title.substring(0, 50) + "</li>";
-                $("#listado").append(cadena);
+                var minutos =  Math.round((val.duration/1000)%60).toString();
+                if (minutos.length == 1) {
+                    minutos = '0'+minutos
+                }
+                cadena = "<li class=\"episodios\" id=\"" + i++ + "\">"+
+                         //"<a href=\"#\">"+
+                         "<a href=\"#capitulo\">" +
+                         "<img src="+val.image_url.replace("\/","/")+">"+
+                         "<h3>" + val.title.substring(0, 50) + "</h3>"+
+                         "<p>" + Math.floor((val.duration/1000)/60) +":"+ minutos + "</p>"+
+                         "</a></li>";
+                         //console.log(cadena);
+                $("#listado").append(cadena).listview('refresh');
             }); // fin de forEach
             // Esto hay que sacarlo a una función externa, que lo tengo dos veces igual...
-            $("#imagen").html("<img align=\"center\" src="+elementos[0].image_url.replace("\/","/")+">");
+            //$("#imagen").html("<img align=\"center\" src="+elementos[0].image_url.replace("\/","/")+">");
             $("#imagen2").html("<img align=center src="+elementos[0].image_url.replace("\/","/")+" >");
             episodio_id = elementos[0].episode_id;
             audio_en_rep = "https://api.spreaker.com/listen/episode/"+episodio_id+"/http";
@@ -86,7 +97,7 @@ function onDeviceReady() {
 
         $("#listado").delegate('.episodios','click',function(){
             posicion = this.id;
-            $("#imagen").html("<img align=center src="+elementos[posicion].image_url.replace("\/","/")+" >");
+            //$("#imagen").html("<img align=center src="+elementos[posicion].image_url.replace("\/","/")+" >");
             $("#imagen2").html("<img align=center src="+elementos[posicion].image_url.replace("\/","/")+" >");
             episodio_id = elementos[posicion].episode_id;
             audio_en_rep = "https://api.spreaker.com/listen/episode/"+episodio_id+"/http";
@@ -94,9 +105,9 @@ function onDeviceReady() {
                                                              function(err){console.log("Error en reproduccion" + err.code)},
                                                              function(msg){reproduciendo = msg; console.log("Estado de la reproduccion" + reproduciendo)});
              console.log("Estado de la reproduccion 1a" + reproduciendo)
-            $.mobile.changePage($("#capitulo"), { transition: "slideup"} );
+         //   $.mobile.changePage($("#capitulo"), { transition: "slideup"} );
         }); // final click episodio
-        
+
         $("#descarga").click(function(){
             episodio_id = elementos[posicion].episode_id;
             var fileTransfer = new FileTransfer();
@@ -110,7 +121,8 @@ function onDeviceReady() {
                 if (progressEvent.lengthComputable) {
             	    var perc = Math.floor(progressEvent.loaded / progressEvent.total * 100);
             		$("#pctDesc").html("<p>Descargado " + perc + "%...<p>");
-            		$("ft-prog").value = perc;
+            		//$("ft-prog").value = perc;
+            		$("slider-descarga").val(perc).slider("refresh");
             	} else {
             	    if($("#pctDesc").html() == "") {
             		    $("#pctDesc").html("Descargando...");
@@ -133,6 +145,10 @@ function onDeviceReady() {
                     console.log("download error source " + error.source);
                     console.log("download error target " + error.target);
                     console.log("download error code" + error.code);
+                    // ESto lo pongo aquí porque cuando cancelo la descarga la ejecución pasa por aquí. Así nos aseguramos de verdad de que la descarga ha terminado.
+                    $("#descarga").html("Descargar");
+                    descargando = false;
+                    $("#pctDesc").html("");
                 },
                 false, {
                     headers: {
@@ -141,9 +157,6 @@ function onDeviceReady() {
                 })
             }
             else {
-                descargando = false;
-            	$("#descarga").html("Descargar");
-                $("#pctDesc").html("");
                 fileTransfer.abort();
             }
         }); //fin ("#descarga").click

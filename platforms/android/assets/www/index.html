@@ -42,29 +42,35 @@
 		<div data-role="content" id="imagen">
 			
 		</div>
-<p><a href="#capitulo" data-role="button" data-theme="c">Reproducir</a></p>
+        <!--<p><a href="#capitulo" data-role="button" data-theme="c">Reproducir</a></p>-->
 		<div data-role="content">
-			<ul class = "my-new-list" id= "listado"></ul>
-			
-		</div>
+			<ul data-role="listview" class = "my-new-list" id= "listado">
+            </ul>
+        </div>
+        <footer data-role="footer" style="background-color:#444444;" >
+            <h2>&copy; radiocable.com</h2>
+        </footer>
+    </div>
 
-		<footer data-role="footer" style="background-color:#444444;" >
-			<h2>&copy; radiocable.com</h2>
-		</footer>
-	</div>
+            <div data-role="page" id="capitulo">
+                <header data-role="header" class="cabecera" style="background-color:#444444;" >
+                    <img class="logo" src="img/cafetera.png" />
+                </header>
 
-	<div data-role="page" id="capitulo">
-		<header data-role="header" class="cabecera" style="background-color:#444444;" >
-			<img class="logo" src="img/cafetera.png" />
-		</header>
+                <div data-role="content">
+                    <div data-role="content" id="imagen2">
+                    </div>
+                    <p><a data-role="button" id="buttonplay" data-theme="c">Reproducir</a></p>
+                    <form>
+                        <input type="range" name="slider-fill" id="slider-fill" value="0" min="0" max="100" data-highlight="true" />
+                    </form>
+                    <p><a data-role="button" id="descarga" data-theme="c">Descargar</a></p>
+                    <div id='pctDesc'><p></p></div>
+                    <!--<progress max="100" value="0" id="ft-prog"></progress>-->
 
-		<div data-role="content">
-			<div data-role="content" id="imagen2">
-			</div>
-			<p><a data-role="button" id="buttonplay" data-theme="c">Reproducir</a></p>
-			<p><a data-role="button" id="descarga" data-theme="c">Descargar</a></p>
-			<div id='pctDesc'><p></p></div>
-			<progress max="100" value="0" id="ft-prog"></progress>
+			<form>
+				<input type="range" name="slider-fill" id="slider-descarga" value="0" min="0" max="100" data-highlight="true" />
+			</form>
 			<p><a href="#index" data-role="button" data-theme="c">Volver a la lista</a></p>
 		</div>
 	</div>
