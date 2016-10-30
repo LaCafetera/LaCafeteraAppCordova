@@ -21,6 +21,9 @@
         },
         "cordova-plugin-media": {
             "PACKAGE_NAME": "io.cordova.hellocordova"
+        },
+        "cordova-plugin-x-socialsharing": {
+            "PACKAGE_NAME": "io.cordova.hellocordova"
         }
     },
     "dependent_plugins": {},
@@ -251,6 +254,14 @@
             "clobbers": [
                 "window.Media"
             ]
+        },
+        {
+            "file": "plugins/cordova-plugin-x-socialsharing/www/SocialSharing.js",
+            "id": "cordova-plugin-x-socialsharing.SocialSharing",
+            "pluginId": "cordova-plugin-x-socialsharing",
+            "clobbers": [
+                "window.plugins.socialsharing"
+            ]
         }
     ],
     "plugin_metadata": {
@@ -258,6 +269,7 @@
         "cordova-plugin-compat": "1.0.0",
         "cordova-plugin-file": "4.3.0",
         "cordova-plugin-file-transfer": "1.6.0",
-        "cordova-plugin-media": "2.4.0"
+        "cordova-plugin-media": "2.4.0",
+        "cordova-plugin-x-socialsharing": "5.1.3"
     }
 }

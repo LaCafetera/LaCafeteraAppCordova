@@ -64,37 +64,55 @@ function onDeviceReady() {
         var reproductor;
         var reproduciendo=0;
         var descargando = false;
-
-        $.getJSON( "https://api.spreaker.com/v2/shows/1060718/episodes?limit=15", function( data ) {
+        console.log("Entrando en inicializa");
+        $.getJSON( "https://api.spreaker.com/v2/shows/1060718/episodes", function( data ) { //?limit=15
             var items = [];
             var cadena ='';
             var i=0;
             elementos = data.response.items.slice();
+            $.getJSON( "https://api.spreaker.com/v2/users/"+elementos[0].author_id, function( dataUser ) {
+                var datosFB=dataUser.response.user;
+                cadena = "<li><img src="+datosFB.image_url.replace("\/","/")+">"+
+                         "<h3>" + datosFB.fullname + "</h3>"+
+                         "<p>" + datosFB.followers_count +" Followers.</p></li>";
+                $("#fberlin").html(cadena).listview('refresh');
+            });
+
             elementos.forEach(function( val ) {
-                cadena = "<li class=\"episodios\" id=\"" + i++ + "\">" + val.title.substring(0, 50) + "</li>";
-                $("#listado").append(cadena);
+                var minutos =  Math.round((val.duration/1000)%60).toString();
+                if (minutos.length == 1) {
+                    minutos = '0'+minutos
+                }
+                if (i == 0) {
+                    cadena = "<li class=\"episodios\" id=\"" + i++ + "\">";
+                } else {
+                    cadena = "<li class=\"episodios\" id=\"" + i++ + "\" data-mini=\"true\">";
+                }
+                cadena += "<a href=\"#capitulo\">" +
+                         "<img src="+val.image_url.replace("\/","/")+">"+
+                         "<h3>" + val.title.substring(0, 50) + "</h3>"+
+                         "<p>" + Math.floor((val.duration/1000)/60) +":"+ minutos + "</p>"+
+                         "</a></li>";
+                         //console.log(cadena);
+                $("#listado").append(cadena).listview('refresh');
+
             }); // fin de forEach
-            // Esto hay que sacarlo a una función externa, que lo tengo dos veces igual...
-            $("#imagen").html("<img align=\"center\" src="+elementos[0].image_url.replace("\/","/")+">");
-            $("#imagen2").html("<img align=center src="+elementos[0].image_url.replace("\/","/")+" >");
-            episodio_id = elementos[0].episode_id;
-            audio_en_rep = "https://api.spreaker.com/listen/episode/"+episodio_id+"/http";
-            reproductor = new Media(encodeURI(audio_en_rep), function(){console.log("comenzando reproduccion")},
-                                                             function(err){console.log("Error en reproduccion" + err.code)},
-                                                             function(msg){reproduciendo = msg; console.log("Estado de la reproduccion" + reproduciendo)});
         }); // fin de getJSON
 
         $("#listado").delegate('.episodios','click',function(){
             posicion = this.id;
-            $("#imagen").html("<img align=center src="+elementos[posicion].image_url.replace("\/","/")+" >");
-            $("#imagen2").html("<img align=center src="+elementos[posicion].image_url.replace("\/","/")+" >");
             episodio_id = elementos[posicion].episode_id;
-            audio_en_rep = "https://api.spreaker.com/listen/episode/"+episodio_id+"/http";
-            reproductor = new Media(encodeURI(audio_en_rep), function(){console.log("comenzando reproduccion")},
-                                                             function(err){console.log("Error en reproduccion" + err.code)},
-                                                             function(msg){reproduciendo = msg; console.log("Estado de la reproduccion" + reproduciendo)});
-             console.log("Estado de la reproduccion 1a" + reproduciendo)
-            $.mobile.changePage($("#capitulo"), { transition: "slideup"} );
+            $.getJSON( "https://api.spreaker.com/v2/episodes/"+episodio_id, function( data ) {
+                var elementosCapitulo = data.response.episode;//.slice();
+                $("#imagen2").html("<img align=center src="+elementosCapitulo.image_url.replace("\/","/")+" >");
+                $("#tituloPag2").html("<p><h2 align=\"center\">"+ elementosCapitulo.title + "</h2></p>");
+                $("#fechaEmision").html("<p><h3  align=\"center\">"+ elementosCapitulo.published_at + "</h3></p>");
+                audio_en_rep = "https://api.spreaker.com/listen/episode/"+episodio_id+"/http";
+                reproductor = new Media(encodeURI(audio_en_rep), function(){console.log("comenzando reproduccion")},
+                                                                 function(err){console.log("Error en reproduccion" + err.code)},
+                                                                 function(msg){reproduciendo = msg});
+            });
+         //   $.mobile.changePage($("#capitulo"), { transition: "slideup"} );
         }); // final click episodio
 
         $("#descarga").click(function(){
@@ -102,13 +120,16 @@ function onDeviceReady() {
             var fileTransfer = new FileTransfer();
             var audio_en_rep = "https://api.spreaker.com/listen/episode/"+episodio_id+"/http";
             var uri = encodeURI(audio_en_rep);
-            var fileURL =  "///storage/sdcard/Podcasts/"+episodio_id+".mp3"; // emulador
+            //var fileURL =  "///storage/sdcard/Podcasts/"+episodio_id+".mp3"; // emulador
             //var fileURL =  "///storage/emulated/0/Podcasts/"+episodio_id+".mp3"; // móvil
+            var fileURL =  cordova.file.dataDirectory + episodio_id + ".mp3";
 
             fileTransfer.onprogress = function(progressEvent) {
                 if (progressEvent.lengthComputable) {
             	    var perc = Math.floor(progressEvent.loaded / progressEvent.total * 100);
             		$("#pctDesc").html("<p>Descargado " + perc + "%...<p>");
+            		//$("ft-prog").value = perc;
+            		//$("slider-descarga").val(perc).slider("refresh");
             	} else {
             	    if($("#pctDesc").html() == "") {
             		    $("#pctDesc").html("Descargando...");
@@ -131,6 +152,10 @@ function onDeviceReady() {
                     console.log("download error source " + error.source);
                     console.log("download error target " + error.target);
                     console.log("download error code" + error.code);
+                    // ESto lo pongo aquí porque cuando cancelo la descarga la ejecución pasa por aquí. Así nos aseguramos de verdad de que la descarga ha terminado.
+                    $("#descarga").html("Descargar");
+                    descargando = false;
+                    $("#pctDesc").html("");
                 },
                 false, {
                     headers: {
@@ -139,27 +164,17 @@ function onDeviceReady() {
                 })
             }
             else {
-                descargando = false;
-            	$("#descarga").html("Descargar");
-                $("#pctDesc").html("");
                 fileTransfer.abort();
             }
         }); //fin ("#descarga").click
 
 
-        $("#play").click(function(){
+        $("#buttonplay").click(function(){
             console.log ("Estado rep "  + reproduciendo);
             if (reproduciendo == Media.MEDIA_RUNNING ) {
                 reproductor.pause();
-                $("#buttonplay").html("Reproducir") ;
+                $("#buttonplay").html("Play") ;
                 reproduciendo = false;
             } else {
                 reproductor.play();
                 $("#buttonplay").html("Pausa") ;
-                reproduciendo = true;
-            }
-        });
-    }
-
-/****************************** directorio ************************************/
-

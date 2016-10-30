@@ -53,6 +53,8 @@ document.addEventListener("deviceready", onDeviceReady, false);
 
 function onDeviceReady() {
    // as soon as this function is called File "should" be defined
+   console.log(FileTransfer);
+   console.log(Media);
    inicializa();
 }
 
@@ -64,6 +66,7 @@ function onDeviceReady() {
         var reproductor;
         var reproduciendo=0;
         var descargando = false;
+        var titulo ;
         console.log("Entrando en inicializa");
         $.getJSON( "https://api.spreaker.com/v2/shows/1060718/episodes", function( data ) { //?limit=15
             var items = [];
@@ -79,6 +82,7 @@ function onDeviceReady() {
             });
 
             elementos.forEach(function( val ) {
+                titulo = val.title;
                 var minutos =  Math.round((val.duration/1000)%60).toString();
                 if (minutos.length == 1) {
                     minutos = '0'+minutos
@@ -111,6 +115,8 @@ function onDeviceReady() {
                 reproductor = new Media(encodeURI(audio_en_rep), function(){console.log("comenzando reproduccion")},
                                                                  function(err){console.log("Error en reproduccion" + err.code)},
                                                                  function(msg){reproduciendo = msg});
+                titulo = elementosCapitulo.title;
+                imagen = elementosCapitulo.image_url.replace("\/","/");
             });
          //   $.mobile.changePage($("#capitulo"), { transition: "slideup"} );
         }); // final click episodio
@@ -169,19 +175,48 @@ function onDeviceReady() {
         }); //fin ("#descarga").click
 
 
-        $("#buttonplay").click(function(){
+        $("#buttonPlay").click(function(){
             console.log ("Estado rep "  + reproduciendo);
             if (reproduciendo == Media.MEDIA_RUNNING ) {
                 reproductor.pause();
-                $("#buttonplay").html("Play") ;
+                $("#buttonPlay").html("Play") ;
                 reproduciendo = false;
             } else {
                 reproductor.play();
-                $("#buttonplay").html("Pausa") ;
-                reproduciendo = true;
+                $("#buttonPlay").html("Pausa") ;
             }
+        }); //fin buttonPlay.click
+
+        $("#buttonComparte").click(function(){
+            console.log ("Compartir es muy bonito ");
+
+            var options = {
+              message: titulo, // not supported on some apps (Facebook, Instagram)
+              subject: 'Creo que esto puede interesarte.', // fi. for email
+              files: [imagen], // an array of filenames either locally or remotely
+              url: audio_en_rep,
+              chooserTitle: 'Selecciona aplicación.' // Android only, you can override the default share sheet title
+            }
+
+            var onSuccess = function(result) {
+              console.log("Share completed? " + result.completed); // On Android apps mostly return false even while it's true
+              console.log("Shared to app: " + result.app); // On Android result.app is currently empty. On iOS it's empty when sharing is cancelled (result.completed=false)
+            }
+
+            var onError = function(msg) {
+              console.log("Sharing failed with message: " + msg);
+            }
+
+            window.plugins.socialsharing.shareWithOptions(options, onSuccess, onError);
+
+        }); // fin buttonComparte.click
+
+
+        $("#buttonLike").click(function(){
+            alert ("Me alegro de que te guste");
+        });
+
+        $("#buttonChat").click(function(){
+            alert ("Chateando que es gerundio.");
         });
     }
-
-/****************************** directorio ************************************/
-
