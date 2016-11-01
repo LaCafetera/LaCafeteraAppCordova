@@ -35,10 +35,9 @@
 
 <!----------------------------------------- Página 1 (listado capítulos). --------------------------------------------------->
 
-<div data-role="page"  data-theme="c" id="index">
+<div data-role="page" id="index">
 	<header data-role="header" class="cabecera" data-position="fixed"> <!--  style="background-color:#444444;" > -->
 		<img class="logo" src="img/cafetera.png" />
-		<h1> La Cafetera de Radiocable</h1>
 	</header>
 
 	<!--<p><a href="#capitulo" data-role="button" data-theme="c">Reproducir</a></p>-->
@@ -60,7 +59,45 @@
 
 <!----------------------------------------- Página 2 (Capítulo en reproducción)  --------------------------------------------------->
 
-<div data-role="page"  data-theme="c" id="capitulo">
+<style type="text/css">
+        .progressbar {
+            width: 100%;
+            height: 16px;
+            background: #9DA5B0;
+            border-radius: 8px;
+            box-shadow: 0 1px 2px 0 rgba(0,0,0,0.5) inset;
+            display: none;
+         }
+         .progressBarIndicator {
+            width: 0%;
+            height: 14px;
+            background: #9BDD62;
+            overflow: hidden;
+            border-radius: 8px;
+            border: 1px solid #4C8932;
+            box-shadow: 0 1px 2px 0 rgba(0,0,0,0.5) inset;
+            position: relative;
+            top: -16px;
+         }
+         .progressBarIndicator:after{
+            content: "";
+            width:100%
+            heigth: 16px;
+            display: block;
+            overflow: hidden;
+            background: url() repeat;
+         }
+         .progressBarLabel {
+            width:100%
+            heigth: 16px;
+            font-size: 14px;
+            color: #000;
+            font-weight: bold;
+            text-align: center;
+         }
+    </style>
+
+<div data-role="page" id="capitulo">
 	<header data-role="header" class="cabecera" data-position="fixed"> <!--  style="background-color:#444444;" > -->
 		<h1> La Cafetera de Radiocable</h1>
 	</header>
@@ -70,13 +107,18 @@
 
 		<div class='ui-field-contain'>
 			<fiedset data-role="controlgroup" data-type="horizontal">
-                <button class="ui-btn ui-btn-inline ui-icon-carat-r ui-shadow  ui-btn-icon-notext" id="buttonPlay"> </button>
-                <button class="ui-btn ui-btn-inline ui-icon-heart ui-shadow ui-btn-icon-notext" id="buttonLike"> </button>
-                <button class="ui-btn ui-btn-inline ui-icon-arrow-d ui-btn-icon-notext" id="descarga"> </button>
+                <button class="ui-btn ui-btn-inline ui-icon-carat-r ui-shadow  ui-btn-icon-notext" id="buttonPlay"></button>
+                <button class="ui-btn ui-btn-inline ui-icon-heart ui-shadow ui-btn-icon-notext" id="buttonLike"></button>
+                <button class="ui-btn ui-btn-inline ui-icon-arrow-d ui-btn-icon-notext" id="descarga"></button>
                 <button class="ui-btn ui-btn-inline ui-icon-mail ui-btn-icon-notext" id="buttonComparte"></button>
                 <a href="#pantallaChat" class="ui-btn ui-btn-inline ui-icon-comment ui-btn-icon-notext"></a>
                 </fiedset>
             </div>
+
+        <div class = progressbar id="barraProgreso">
+            <div  class = progressBarLabel id= "barraProgresoMSG">0%</div>
+            <div  class = progressBarIndicator id= "barraProgresoInd"></div>
+        </div>
 
             <div data-role="content" id="tituloPag2">
             </div>
@@ -87,9 +129,11 @@
             <form>
                 <input type="range" name="slider-fill" id="slider-fill" value="0" min="0" max="100" data-highlight="true" />
             </form>
-            <p><a data-role="button" id="descarga" data-theme="c">Descargar</a></p>-->
+            <p><a data-role="button" id="descarga" data-theme="c">Descargar</a></p>
 		<div id='pctDesc'><p></p></div>
-        <div id='pctDesc2'><progress id="progDescarga" value="0" max="100"></progress></div>
+        <div id='pctDesc2'><progress id="progDescarga" value="0" max="100"></progress></div>-->
+
+
 		<!--<progress max="100" value="0" id="ft-prog"></progress>
 
 <!--<form>
@@ -101,7 +145,7 @@
 
 <!----------------------------------------- Página 3 (Datos La Cafetera) --------------------------------------------------->
 
-<div data-role="page"  data-theme="c" id="pantalla3">
+<div data-role="page" id="pantalla3">
     <header data-role="header" class="cabecera" data-position="fixed"> <!--  style="background-color:#444444;" > -->
         <img class="logo" src="img/cafetera.png" />
     </header>
@@ -127,17 +171,22 @@
 </div>
 
 <!----------------------------------------- Página 4 (Chat) --------------------------------------------------->
-    <style>
-    tr {
-        border-bottom: 1px solid #d6d6d6;
-    }
+    <style type="text/css">
+        tr {
+            border-bottom: 5px solid #FFF;
+         }
+         td {
+            background:url(js/images/bocadillo.png) right top;
+            background-repeat:no-repeat;
+            border-bottom: 5px solid #FFF;
+         }
     </style>
-    <div data-role="page"  data-theme="c" id="pantallaChat">
+    <div data-role="page"id="pantallaChat">
         <header data-role="header" class="cabecera" data-position="fixed"> <!--  style="background-color:#444444;" > -->
             <img class="logo" src="img/cafetera.png" />
         </header>
-        <div data-role="content">
-            <table data-role="table" class="ui-responsive">
+        <div data-role="main">
+            <table data-role="table" class="ui-responsive table-stroke table-stripe" id="tablaChat">
                 <thead>
                     <tr>
                         <th></th>
@@ -147,8 +196,10 @@
                 <tbody id="Chat">
                 </tbody>
             </table>
-            <!--<ul data-role="listview" class = "my-new-list" id="Chat"></ul>-->
         </div>
+    </div>
+    <div data-role="footer" data-position="fixed" style="background-color:#444444;" >
+
     </div>
 </body>
 <!-- end page 2 -->
@@ -167,7 +218,7 @@
 
 <script type="text/javascript" src="js/jquery-1.5.0.mobile.min.js"></script><script type="text/javascript" src="js/index.js"></script>
 <script type="text/javascript" id="jqm-trans-disable">
-/*inicializa();Esto para probar en navegadores pc*/
+/*inicializa();Esto para probar en navegadores pc. Lo comento porque así se ejecuta dos veces y da problemas*/
 
 		</script>
 </body>

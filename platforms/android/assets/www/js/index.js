@@ -52,7 +52,6 @@ app.initialize(); */
 document.addEventListener("deviceready", onDeviceReady, false);
 
 function onDeviceReady() {
-   // as soon as this function is called File "should" be defined
    console.log(FileTransfer);
    console.log(Media);
    inicializa();
@@ -62,6 +61,7 @@ function onDeviceReady() {
    function inicializa(){
         var elementos;
         var audio_en_rep="0";
+        var enlace = "";
         var posicion=0;
         var reproductor;
         var reproduciendo=0;
@@ -77,7 +77,7 @@ function onDeviceReady() {
                 var datosFB=dataUser.response.user;
                 cadena = "<li><img src="+datosFB.image_url.replace("\/","/")+">"+
                          "<h3>" + datosFB.fullname + "</h3>"+
-                         "<p class=\"ui-li-aside ui-li-count\">" + datosFB.followers_count +" Followers.</p></li>";
+                         "<p>" + datosFB.followers_count +" Followers.</p></li>";
                 $("#fberlin").html(cadena).listview('refresh');
             });
 
@@ -108,7 +108,7 @@ function onDeviceReady() {
             episodio_id = elementos[posicion].episode_id;
             $.getJSON( "https://api.spreaker.com/v2/episodes/"+episodio_id, function( data ) {
                 var elementosCapitulo = data.response.episode;//.slice();
-                $("#imagen2").html("<img align=center src="+elementosCapitulo.image_url.replace("\/","/")+" >");
+                $("#imagen2").html("<img align=center src="+elementosCapitulo.image_url+" >");
                 $("#tituloPag2").html("<p><h2 align=\"center\">"+ elementosCapitulo.title + "</h2></p>");
                 $("#fechaEmision").html("<p><h3 align=\"center\">"+ elementosCapitulo.published_at + "</h3></p>");
                 audio_en_rep = "https://api.spreaker.com/listen/episode/"+episodio_id+"/http";
@@ -117,37 +117,43 @@ function onDeviceReady() {
                                                                  function(msg){reproduciendo = msg});
                 titulo = elementosCapitulo.title;
                 imagen = elementosCapitulo.image_url.replace("\/","/");
+                enlaceEpisodio = "https://www.spreaker.com/episode/"+episodio_id;
             });
             $.getJSON( "https://api.spreaker.com/v2/episodes/"+episodio_id+"/messages", function( dataMsg ) {
                 var items = [];
                 var cadena ='';
                 var i=0;
+                var imagenAutor;
                 mensaje = dataMsg.response.items.slice();
                 $("#Chat").empty();
                 mensaje.forEach(function( val ) {
-                /*    cadena = "<li>" +
-                             "<img src="+val.author_image_url.replace("\/","/")+">"+
-                             //"<h3>" + val.author_fullname + "</h3> (" + val.created_at + ") mediante <a href=\"" + val.app_url + "\">" + val.app_name + "</a>"+
-                             "<b>" + val.author_fullname + "</b> " + "<p class=\"ui-li-aside ui-li-count\">" + val.created_at + "</p>"
-                              //"<h3>" + val.author_fullname + "</h3> (" + val.created_at + ") "+
-                              +"<p>" val.text +"</p>"+
-                             "</li>";
-                        console.log(cadena);*/
-                    cadena = "<tr><td><img src="+val.author_image_url.replace("\/","/")+" width=\"40\" height=\"40\"></td>"+
-                             "<td><b>" + val.author_fullname + "</b> ("+ val.created_at + ")" + //"<p class=\"ui-li-aside ui-li-count\">" + val.created_at + "</p>" +
+                    if (val.author_image_url == null){
+                        imagenAutor = 'img/logo.png';
+                    }
+                    else {
+                        imagenAutor = val.author_image_url;
+                    }
+                    cadena = "<tr><td><img src="+imagenAutor+" width=\"50\" height=\"50\"></td>"+
+                             "<td style=\"background-color:#ccc; margin:5px\"><b>" + val.author_fullname + "</b> ("+ val.created_at + ")" + //"<p class=\"ui-li-aside ui-li-count\">" + val.created_at + "</p>" +
                              "<p>" + val.text +"</p></td></tr>";
+                      /*cadena = "<div id=\"cajaFoto\" style= \"display:inline-block; margin:5px\">" +
+                               "<img src="+val.author_image_url.replace("\/","/")+" width=\"40\" height=\"40\">" +
+                               "</div>" +
+                               "<div id=\"cajaTexto\" style= \"display:inline-block; margin:5px\">" +
+                               "<b>" + val.author_fullname + "</b> " + "  " + val.created_at + "  " +
+                               "<p>" + val.text + "</p>" +
+                               "</div>";*/
                     $("#Chat").append(cadena);//.listview('refresh');
                 }); // fin de forEach
+                $("#tablaChat").table("rebuild");
             }); //final getJSON (chat)
-            $("#Chat").listview('refresh');
+            //$("#Chat").listview('refresh');
         }); // final click episodio
 
         $("#descarga").click(function(){
             episodio_id = elementos[posicion].episode_id;
-            var audio_en_rep = "https://api.spreaker.com/listen/episode/"+episodio_id+"/http";
-            var uri = encodeURI(audio_en_rep);
-            //var fileURL =  "///storage/sdcard/Podcasts/"+episodio_id+".mp3"; // emulador
-            //var fileURL =  "///storage/emulated/0/Podcasts/"+episodio_id+".mp3"; // móvil
+            var audio_en_desc = "https://api.spreaker.com/download/episode/"+episodio_id+"/.mp3";
+            var uri = encodeURI(audio_en_desc);
             var fileURL =  cordova.file.dataDirectory + episodio_id + ".mp3";
             if (!descargando) {
                 fileTransfer = new FileTransfer();
@@ -155,27 +161,19 @@ function onDeviceReady() {
             fileTransfer.onprogress = function(progressEvent) {
                 if (progressEvent.lengthComputable) {
             	    var perc = Math.floor(progressEvent.loaded / progressEvent.total * 100);
-            		$("#pctDesc").html("<p>Descargado " + perc + "%...<p>");
-//            		var element = document.querySelector('#progDescarga');
-  //          		element.value = Math.round(perc);
-            		//$("#progDescarga").value = Math.round(perc);
-            		document.getElementById("progDescarga").value = perc;
-            		//$("ft-prog").value = perc;
-            	//	$("#slider-descarga").val(perc).slider("refresh");
-          /*  	} else {
-            	    if($("#pctDesc").html() == "") {
-            		    $("#pctDesc").html("Descargando...");
-            		} else {
-            		    $("#pctDesc").html($("#pctDesc").html()+ ".") ;
-            		}*/
+            	//	$("#pctDesc").html("<p>Descargado " + perc + "%...<p>");
+            	//	document.getElementById("progDescarga").value = perc;
+            		$("#barraProgresoMSG").html (perc + " %");
+            		document.getElementById("barraProgresoInd").style.width=perc;
             	}
             }; // fin onprogress
 
             if (!descargando){
                 descargando = true;
-            	$("#descarga").html("Cancelar descarga");
-                console.log("Comenzando la descarga del fichero "+ audio_en_rep);
-                $("#pctDesc").html("");
+                console.log("Comenzando la descarga del fichero "+ enlaceEpisodio);
+              //  $("#pctDesc").html("");
+              //  document.getElementById("progDescarga").style.display = 'block';
+                document.getElementById("barraProgreso").style.display = 'block';
                 fileTransfer.download(
                     uri, fileURL, function(entry) {
                     console.log("Descargando ");
@@ -185,9 +183,13 @@ function onDeviceReady() {
                     console.log("download error target " + error.target);
                     console.log("download error code" + error.code);
                     // ESto lo pongo aquí porque cuando cancelo la descarga la ejecución pasa por aquí. Así nos aseguramos de verdad de que la descarga ha terminado.
-                    $("#descarga").html("Descargar");
                     descargando = false;
-                    $("#pctDesc").html("");
+                    //$("#pctDesc").html("");
+            		//document.getElementById("progDescarga").value = 0;
+                    //document.getElementById("progDescarga").style.display = 'none';
+            		$("#barraProgresoMSG").html ("0 %");
+            		document.getElementById("barraProgresoInd").style.width=0;
+                    document.getElementById("barraProgreso").style.display = 'none';
                 },
                 false, {
                     headers: {
@@ -206,11 +208,13 @@ function onDeviceReady() {
             console.log ("Estado rep "  + reproduciendo);
             if (reproduciendo == Media.MEDIA_RUNNING ) {
                 reproductor.pause();
-                $("#buttonPlay").html("Play") ;
+                console.log ("Reproductor en Pausa");
+               // $("#buttonPlay").html("Play") ;
                 reproduciendo = false;
             } else {
                 reproductor.play();
-                $("#buttonPlay").html("Pausa") ;
+                console.log ("Reproductor reproduciendo");
+               // $("#buttonPlay").html("Pausa") ;
             }
         }); //fin buttonPlay.click
 
@@ -220,8 +224,8 @@ function onDeviceReady() {
             var options = {
               message: titulo, // not supported on some apps (Facebook, Instagram)
               subject: 'Creo que esto puede interesarte.', // fi. for email
-              files: [imagen], // an array of filenames either locally or remotely
-              url: audio_en_rep,
+              files: [], //[imagen], // an array of filenames either locally or remotely
+              url: enlaceEpisodio,
               chooserTitle: 'Selecciona aplicación.' // Android only, you can override the default share sheet title
             }
 
