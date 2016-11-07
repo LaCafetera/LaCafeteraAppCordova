@@ -1,12 +1,14 @@
 <?xml version='1.0' encoding='utf-8'?>
 <widget id="io.cordova.hellocordova" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <name>HelloCordova</name>
+    <name>LaCafetera</name>
     <description>
-        A sample Apache Cordova application that responds to the deviceready event.
+        Programa para oir los mensajes de Maese Fernando y María.
     </description>
     <author email="dev@cordova.apache.org" href="http://cordova.io">
-        Apache Cordova Team
+        El Grupo Java de La Resistencia de La Cafetera
     </author>
+    <icon density="mdpi" height="57" platform="ios" src="www/img/Cafetera_icono.png" width="57" />
+    <icon density="mdpi" height="57" platform="android" src="www/img/Cafetera_icono.png" width="57" />
     <content src="index.html" />
     <access origin="*" />
     <allow-intent href="http://*/*" />

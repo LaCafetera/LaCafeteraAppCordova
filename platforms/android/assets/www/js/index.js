@@ -68,6 +68,16 @@ function onDeviceReady() {
         var descargando = false;
         var titulo ;
         var fileTransfer;// = new FileTransfer();
+        var pos_reproduccion;
+
+        $(".barra").find('input').hide();
+        $(".barra").find('input').css('margin-left','15px'); // Fix for some FF versions
+        $(".barra").find('.ui-slider-track').css('margin','0 15px 0 15px');
+        $(".barra").find('.ui-slider-handle').hide();
+        $('.slider').slider();
+        //$("#slider-descarga").slider("refresh");
+        document.getElementById("barra_descarga").style.display = 'none';
+
         $.getJSON( "https://api.spreaker.com/v2/shows/1060718/episodes", function( data ) { //?limit=15
             var items = [];
             var cadena ='';
@@ -136,13 +146,6 @@ function onDeviceReady() {
                     cadena = "<tr><td><img src="+imagenAutor+" width=\"50\" height=\"50\"></td>"+
                              "<td style=\"background-color:#ccc; margin:5px\"><b>" + val.author_fullname + "</b> ("+ val.created_at + ")" + //"<p class=\"ui-li-aside ui-li-count\">" + val.created_at + "</p>" +
                              "<p>" + val.text +"</p></td></tr>";
-                      /*cadena = "<div id=\"cajaFoto\" style= \"display:inline-block; margin:5px\">" +
-                               "<img src="+val.author_image_url.replace("\/","/")+" width=\"40\" height=\"40\">" +
-                               "</div>" +
-                               "<div id=\"cajaTexto\" style= \"display:inline-block; margin:5px\">" +
-                               "<b>" + val.author_fullname + "</b> " + "  " + val.created_at + "  " +
-                               "<p>" + val.text + "</p>" +
-                               "</div>";*/
                     $("#Chat").append(cadena);//.listview('refresh');
                 }); // fin de forEach
                 $("#tablaChat").table("rebuild");
@@ -161,19 +164,17 @@ function onDeviceReady() {
             fileTransfer.onprogress = function(progressEvent) {
                 if (progressEvent.lengthComputable) {
             	    var perc = Math.floor(progressEvent.loaded / progressEvent.total * 100);
-            	//	$("#pctDesc").html("<p>Descargado " + perc + "%...<p>");
-            	//	document.getElementById("progDescarga").value = perc;
-            		$("#barraProgresoMSG").html (perc + " %");
-            		document.getElementById("barraProgresoInd").style.width=perc;
+            		$("#slider-descarga").val(perc).slider("refresh");
+                    $("#slider-descarga").closest(".ui-slider").find(".ui-slider-handle").text(perc+"%");
             	}
             }; // fin onprogress
 
             if (!descargando){
                 descargando = true;
                 console.log("Comenzando la descarga del fichero "+ enlaceEpisodio);
-              //  $("#pctDesc").html("");
-              //  document.getElementById("progDescarga").style.display = 'block';
-                document.getElementById("barraProgreso").style.display = 'block';
+
+                document.getElementById("barra_descarga").style.display = 'block';
+
                 fileTransfer.download(
                     uri, fileURL, function(entry) {
                     console.log("Descargando ");
@@ -184,12 +185,8 @@ function onDeviceReady() {
                     console.log("download error code" + error.code);
                     // ESto lo pongo aquí porque cuando cancelo la descarga la ejecución pasa por aquí. Así nos aseguramos de verdad de que la descarga ha terminado.
                     descargando = false;
-                    //$("#pctDesc").html("");
-            		//document.getElementById("progDescarga").value = 0;
-                    //document.getElementById("progDescarga").style.display = 'none';
-            		$("#barraProgresoMSG").html ("0 %");
-            		document.getElementById("barraProgresoInd").style.width=0;
-                    document.getElementById("barraProgreso").style.display = 'none';
+                    $("#slider-descarga").closest(".ui-slider").find(".ui-slider-handle").text("0 %");
+                    document.getElementById("barra_descarga").style.display = 'none';
                 },
                 false, {
                     headers: {
@@ -211,9 +208,26 @@ function onDeviceReady() {
                 console.log ("Reproductor en Pausa");
                // $("#buttonPlay").html("Play") ;
                 reproduciendo = false;
+                clearInterval(pos_reproduccion);
             } else {
                 reproductor.play();
-                console.log ("Reproductor reproduciendo");
+                pos_reproduccion = setInterval(function () {
+                                       // get media position
+                                       reproductor.getCurrentPosition(
+                                           // success callback
+                                           function (position) {
+                                               if (position > -1) {
+                                                    console.log((position) + " sec");
+                                                    $("#slider-rep").closest(".ui-slider").find(".ui-slider-handle").text(position + "%");
+                                                    console.log ("Reproductor por " + position);
+                                               }
+                                           },
+                                           // error callback
+                                           function (e) {
+                                               console.log("Error getting pos=" + e);
+                                           }
+                                       );
+                                   }, 1000);
                // $("#buttonPlay").html("Pausa") ;
             }
         }); //fin buttonPlay.click

@@ -59,44 +59,6 @@
 
 <!----------------------------------------- Página 2 (Capítulo en reproducción)  --------------------------------------------------->
 
-<style type="text/css">
-        .progressbar {
-            width: 100%;
-            height: 16px;
-            background: #9DA5B0;
-            border-radius: 8px;
-            box-shadow: 0 1px 2px 0 rgba(0,0,0,0.5) inset;
-            display: none;
-         }
-         .progressBarIndicator {
-            width: 0%;
-            height: 14px;
-            background: #9BDD62;
-            overflow: hidden;
-            border-radius: 8px;
-            border: 1px solid #4C8932;
-            box-shadow: 0 1px 2px 0 rgba(0,0,0,0.5) inset;
-            position: relative;
-            top: -16px;
-         }
-         .progressBarIndicator:after{
-            content: "";
-            width:100%
-            heigth: 16px;
-            display: block;
-            overflow: hidden;
-            background: url() repeat;
-         }
-         .progressBarLabel {
-            width:100%
-            heigth: 16px;
-            font-size: 14px;
-            color: #000;
-            font-weight: bold;
-            text-align: center;
-         }
-    </style>
-
 <div data-role="page" id="capitulo">
 	<header data-role="header" class="cabecera" data-position="fixed"> <!--  style="background-color:#444444;" > -->
 		<h1> La Cafetera de Radiocable</h1>
@@ -107,71 +69,56 @@
 
 		<div class='ui-field-contain'>
 			<fiedset data-role="controlgroup" data-type="horizontal">
-                <button class="ui-btn ui-btn-inline ui-icon-carat-r ui-shadow  ui-btn-icon-notext" id="buttonPlay"></button>
-                <button class="ui-btn ui-btn-inline ui-icon-heart ui-shadow ui-btn-icon-notext" id="buttonLike"></button>
-                <button class="ui-btn ui-btn-inline ui-icon-arrow-d ui-btn-icon-notext" id="descarga"></button>
-                <button class="ui-btn ui-btn-inline ui-icon-mail ui-btn-icon-notext" id="buttonComparte"></button>
-                <a href="#pantallaChat" class="ui-btn ui-btn-inline ui-icon-comment ui-btn-icon-notext"></a>
-                </fiedset>
-            </div>
-
-        <div class = progressbar id="barraProgreso">
-            <div  class = progressBarLabel id= "barraProgresoMSG">0%</div>
-            <div  class = progressBarIndicator id= "barraProgresoInd"></div>
-        </div>
-
-            <div data-role="content" id="tituloPag2">
-            </div>
-            <div data-role="content" id="fechaEmision">
-            </div>
-
-            <!--<p><a data-role="button" id="buttonplay" data-theme="c">Reproducir</a></p>
-            <form>
-                <input type="range" name="slider-fill" id="slider-fill" value="0" min="0" max="100" data-highlight="true" />
-            </form>
-            <p><a data-role="button" id="descarga" data-theme="c">Descargar</a></p>
-		<div id='pctDesc'><p></p></div>
-        <div id='pctDesc2'><progress id="progDescarga" value="0" max="100"></progress></div>-->
+				<button class="ui-btn ui-btn-inline ui-icon-carat-r ui-shadow  ui-btn-icon-notext" id="buttonPlay"></button>
+				<button class="ui-btn ui-btn-inline ui-icon-heart ui-shadow ui-btn-icon-notext" id="buttonLike"></button>
+				<button class="ui-btn ui-btn-inline ui-icon-arrow-d ui-btn-icon-notext" id="descarga"></button>
+				<button class="ui-btn ui-btn-inline ui-icon-mail ui-btn-icon-notext" id="buttonComparte"></button>
+				<a href="#pantallaChat" class="ui-btn ui-btn-inline ui-icon-comment ui-btn-icon-notext"></a>
+			</fiedset>
+		</div>
+		<div data-role="content" id="barra_reprod" name="barra">
+			<input type="range" name="slider-rep" id="slider-rep" value="0" min="0" max="100" data-highlight="true" type="range">
+		</div>
+		<div data-role="content" id="barra_descarga" name="barra">
+			<input type="range" name="slider-fill" id="slider-descarga" value="0" min="0" max="100" data-highlight="true" type="range" style="margin-left:15px">
+		</div>
+		<div data-role="content" id="tituloPag2"></div>
+		<div data-role="content" id="fechaEmision"></div>
 
 
-		<!--<progress max="100" value="0" id="ft-prog"></progress>
-
-<!--<form>
-<input type="range" name="slider-fill" id="slider-descarga" value="0" min="0" max="100" data-highlight="true" />
-</form>-->
-		<p><a href="#index" data-role="button" data-theme="c">Volver a la lista</a></p>
+		<p><a href="#" data-role="button" data-theme="c" data-rel="back">Volver a la lista</a></p>
 	</div>
 </div>
 
 <!----------------------------------------- Página 3 (Datos La Cafetera) --------------------------------------------------->
 
 <div data-role="page" id="pantalla3">
-    <header data-role="header" class="cabecera" data-position="fixed"> <!--  style="background-color:#444444;" > -->
-        <img class="logo" src="img/cafetera.png" />
-    </header>
-    <div data-role="content">
-        <ul data-role="listview" class = "my-new-list" id="fberlin"></ul>
-    </div>
-    <div data-role="content" id="descFBerlin">
-        <p>LaCafetera de <a href="www.radiocable.com">radiocable.com</a>. Dirige Fernando Berlín</p>
-        <p>Programa de radio en directo y en diferido.</p>
-        <p>Pionera emisora de radio por internet. Nació el 14 de mayo de 1.997 emitiendo desde un domicilio. Premio Ondas y del Club internacional de prensa.</p>
-        <a href='https://play.google.com/store/apps/details?id=com.spreaker.custom.prod.app_6243'><img src="./js/images/google-play-icon.png"></a>
-    </div>
+	<header data-role="header" class="cabecera" data-position="fixed"> <!--  style="background-color:#444444;" > -->
+		<img class="logo" src="img/cafetera.png" />
+	</header>
+	<div data-role="content">
+		<ul data-role="listview" class = "my-new-list" id="fberlin"></ul>
+	</div>
+	<div data-role="content" id="descFBerlin">
+		<p>LaCafetera de <a href="www.radiocable.com">radiocable.com</a>. Dirige Fernando Berlín</p>
+		<p>Programa de radio en directo y en diferido.</p>
+		<p>Pionera emisora de radio por internet. Nació el 14 de mayo de 1.997 emitiendo desde un domicilio. Premio Ondas y del Club internacional de prensa.</p>
+		<a href='https://play.google.com/store/apps/details?id=com.spreaker.custom.prod.app_6243'><img src="./js/images/google-play-icon.png"></a>
+	</div>
 
-    <div data-role="footer" data-position="fixed" style="background-color:#444444;" >
-        <div data-role="navbar">
-            <ul>
-                <li><a href="#index" >PISTAS</a></li>
-                <li><a href="#">INFO</a></li>
-            </ul>
-        </div>
-        <!--     <h2>&copy; radiocable.com</h2> -->
-    </div>
+	<div data-role="footer" data-position="fixed" style="background-color:#444444;" >
+		<div data-role="navbar">
+			<ul>
+				<li><a href="#" data-rel="back" >PISTAS</a></li>
+				<li><a href="#">INFO</a></li>
+			</ul>
+		</div>
+		<!--     <h2>&copy; radiocable.com</h2> -->
+	</div>
 </div>
 
 <!----------------------------------------- Página 4 (Chat) --------------------------------------------------->
-    <style type="text/css">
+<style type="text/css">
         tr {
             border-bottom: 5px solid #FFF;
          }
@@ -181,26 +128,29 @@
             border-bottom: 5px solid #FFF;
          }
     </style>
-    <div data-role="page"id="pantallaChat">
-        <header data-role="header" class="cabecera" data-position="fixed"> <!--  style="background-color:#444444;" > -->
-            <img class="logo" src="img/cafetera.png" />
-        </header>
-        <div data-role="main">
-            <table data-role="table" class="ui-responsive table-stroke table-stripe" id="tablaChat">
-                <thead>
-                    <tr>
-                        <th></th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody id="Chat">
-                </tbody>
-            </table>
-        </div>
-    </div>
-    <div data-role="footer" data-position="fixed" style="background-color:#444444;" >
+<div data-role="page"id="pantallaChat">
+	<header data-role="header" class="cabecera" data-position="fixed"> <!--  style="background-color:#444444;" > -->
+		<img class="logo" src="img/cafetera.png" />
+	</header>
+	<div data-role="main">
+		<table data-role="table" class="ui-responsive table-stroke table-stripe" id="tablaChat">
+			<thead>
+			<tr>
+				<th></th>
+				<th></th>
+			</tr>
+			</thead>
+			<tbody id="Chat">
+			</tbody>
+		</table>
+	</div>
+	<footer data-role="footer" data-position="fixed"> <!--  style="background-color:#444444;" > -->
+		<a href="#" data-rel="back" >Volver</a>
+	</footer>
+</div>
+<div data-role="footer" data-position="fixed" style="background-color:#444444;" >
 
-    </div>
+</div>
 </body>
 <!-- end page 2 -->
 <script type="text/javascript" src="cordova.js"></script>
