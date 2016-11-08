@@ -1,0 +1,175 @@
+<html>
+<head>
+	<!--
+    Customize this policy to fit your own app's needs. For more guidance, see:
+        https://github.com/apache/cordova-plugin-whitelist/blob/master/README.md#content-security-policy
+    Some notes:
+        * gap: is required only on iOS (when using UIWebView) and is needed for JS->native communication
+        * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
+        * Disables use of inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
+            * Enable inline JS: add 'unsafe-inline' to default-src
+
+    <meta http-equiv="Content-Security-Policy" content="default-src &apos;self&apos; data: gap: https://ssl.gstatic.com &apos;unsafe-eval&apos;; style-src &apos;self&apos; &apos;unsafe-inline&apos;; media-src *">
+    -->    <meta name="format-detection" content="telephone=no">
+	<meta name="msapplication-tap-highlight" content="no">
+	<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+
+	<link rel="stylesheet" type="text/css" href="js/jquery-1.5.0.mobile.min.css">
+	<link rel="stylesheet" type="text/css" href="css/index.css">
+	<style>
+		/* For avoiding title truncation in wp8 */
+		.ui-header .ui-title {
+				overflow: visible !important;
+		}
+		/* For fixing the absolute position issue for the default cordova gen page*/
+		#cjp-accordion1 .app {
+				left: 5px !important;
+				margin: 5px !important;
+				position: relative !important;
+		}
+		</style>
+	<title>La Cafetera</title>
+</head>
+
+<body>
+
+<!----------------------------------------- Página 1 (listado capítulos). --------------------------------------------------->
+
+<div data-role="page" id="index">
+	<header data-role="header" class="cabecera" data-position="fixed"> <!--  style="background-color:#444444;" > -->
+		<img class="logo" src="img/cafetera.png" />
+	</header>
+
+	<!--<p><a href="#capitulo" data-role="button" data-theme="c">Reproducir</a></p>-->
+	<div data-role="content">
+		<ul data-role="listview" class = "my-new-list" id= "listado">
+		</ul>
+	</div>
+
+	<div data-role="footer" data-position="fixed" style="background-color:#444444;" >
+		<div data-role="navbar">
+			<ul>
+				<li><a href="#">PISTAS</a></li>
+				<li><a href="#pantalla3">INFO</a></li>
+			</ul>
+		</div>
+		<!--     <h2>&copy; radiocable.com</h2> -->
+	</div>
+</div>
+
+<!----------------------------------------- Página 2 (Capítulo en reproducción)  --------------------------------------------------->
+
+<div data-role="page" id="capitulo">
+	<header data-role="header" class="cabecera" data-position="fixed"> <!--  style="background-color:#444444;" > -->
+		<h1> La Cafetera de Radiocable</h1>
+	</header>
+	<div data-role="content">
+		<div data-role="content" id="imagen2">
+		</div>
+
+		<div class='ui-field-contain'>
+			<fiedset data-role="controlgroup" data-type="horizontal">
+				<button class="ui-btn ui-btn-inline ui-icon-carat-r ui-shadow  ui-btn-icon-notext" id="buttonPlay"></button>
+				<button class="ui-btn ui-btn-inline ui-icon-heart ui-shadow ui-btn-icon-notext" id="buttonLike"></button>
+				<button class="ui-btn ui-btn-inline ui-icon-arrow-d ui-btn-icon-notext" id="descarga"></button>
+				<button class="ui-btn ui-btn-inline ui-icon-mail ui-btn-icon-notext" id="buttonComparte"></button>
+				<a href="#pantallaChat" class="ui-btn ui-btn-inline ui-icon-comment ui-btn-icon-notext"></a>
+			</fiedset>
+		</div>
+		<div data-role="content" id="barra_reprod" name="barra">
+			<input type="range" name="slider-rep" id="slider-rep" value="0" min="0" max="100" data-highlight="true" type="range">
+		</div>
+		<div data-role="content" id="barra_descarga" name="barra">
+			<input type="range" name="slider-fill" id="slider-descarga" value="0" min="0" max="100" data-highlight="true" type="range" style="margin-left:15px">
+		</div>
+		<div data-role="content" id="tituloPag2"></div>
+		<div data-role="content" id="fechaEmision"></div>
+
+
+		<p><a href="#" data-role="button" data-theme="c" data-rel="back">Volver a la lista</a></p>
+	</div>
+</div>
+
+<!----------------------------------------- Página 3 (Datos La Cafetera) --------------------------------------------------->
+
+<div data-role="page" id="pantalla3">
+	<header data-role="header" class="cabecera" data-position="fixed"> <!--  style="background-color:#444444;" > -->
+		<img class="logo" src="img/cafetera.png" />
+	</header>
+	<div data-role="content">
+		<ul data-role="listview" class = "my-new-list" id="fberlin"></ul>
+	</div>
+	<div data-role="content" id="descFBerlin">
+		<p>LaCafetera de <a href="www.radiocable.com">radiocable.com</a>. Dirige Fernando Berlín</p>
+		<p>Programa de radio en directo y en diferido.</p>
+		<p>Pionera emisora de radio por internet. Nació el 14 de mayo de 1.997 emitiendo desde un domicilio. Premio Ondas y del Club internacional de prensa.</p>
+		<a href='https://play.google.com/store/apps/details?id=com.spreaker.custom.prod.app_6243'><img src="./js/images/google-play-icon.png"></a>
+	</div>
+
+	<div data-role="footer" data-position="fixed" style="background-color:#444444;" >
+		<div data-role="navbar">
+			<ul>
+				<li><a href="#" data-rel="back" >PISTAS</a></li>
+				<li><a href="#">INFO</a></li>
+			</ul>
+		</div>
+		<!--     <h2>&copy; radiocable.com</h2> -->
+	</div>
+</div>
+
+<!----------------------------------------- Página 4 (Chat) --------------------------------------------------->
+<style type="text/css">
+        tr {
+            border-bottom: 5px solid #FFF;
+         }
+         td {
+            background:url(js/images/bocadillo.png) right top;
+            background-repeat:no-repeat;
+            border-bottom: 5px solid #FFF;
+         }
+    </style>
+<div data-role="page"id="pantallaChat">
+	<header data-role="header" class="cabecera" data-position="fixed"> <!--  style="background-color:#444444;" > -->
+		<img class="logo" src="img/cafetera.png" />
+	</header>
+	<div data-role="main">
+		<table data-role="table" class="ui-responsive table-stroke table-stripe" id="tablaChat">
+			<thead>
+			<tr>
+				<th></th>
+				<th></th>
+			</tr>
+			</thead>
+			<tbody id="Chat">
+			</tbody>
+		</table>
+	</div>
+	<footer data-role="footer" data-position="fixed"> <!--  style="background-color:#444444;" > -->
+		<a href="#" data-rel="back" >Volver</a>
+	</footer>
+</div>
+<div data-role="footer" data-position="fixed" style="background-color:#444444;" >
+
+</div>
+</body>
+<!-- end page 2 -->
+<script type="text/javascript" src="cordova.js"></script>
+
+<script type="text/javascript" src="js/jquery-1.11.1.min.js" id="cordova-jquery"></script>
+
+<script type="text/javascript" id="jqm-trans-disable">
+		/* For having a faster transition */
+		$(document).on("mobileinit", function() {
+				$.mobile.defaultPageTransition = "none";
+				$.mobile.defaultDialogTransition = "none";
+		});
+
+		</script>
+
+<script type="text/javascript" src="js/jquery-1.5.0.mobile.min.js"></script><script type="text/javascript" src="js/index.js"></script>
+<script type="text/javascript" id="jqm-trans-disable">
+/*inicializa();Esto para probar en navegadores pc. Lo comento porque así se ejecuta dos veces y da problemas*/
+
+		</script>
+</body>
+</html>
