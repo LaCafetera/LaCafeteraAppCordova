@@ -69,14 +69,13 @@ function onDeviceReady() {
         var titulo ;
         var fileTransfer;// = new FileTransfer();
         var pos_reproduccion;
+        var tipoEmision;
 
-        $(".barra").find('input').hide();
-        $(".barra").find('input').css('margin-left','15px'); // Fix for some FF versions
-        $(".barra").find('.ui-slider-track').css('margin','0 15px 0 15px');
-        $(".barra").find('.ui-slider-handle').hide();
-        $('.slider').slider();
-        //$("#slider-descarga").slider("refresh");
-        document.getElementById("barra_descarga").style.display = 'none';
+        $("#barra_reprod").find('input').hide();
+        $("#barra_reprod").find('input').css('margin-left','15px'); // Fix for some FF versions
+        $("#barra_reprod").find('.ui-slider-track').css('margin','0 15px 0 15px');
+        $('#slider-descarga').hide();
+        //document.getElementById("barra_descarga").style.display = 'none';
 
         $.getJSON( "https://api.spreaker.com/v2/shows/1060718/episodes", function( data ) { //?limit=15
             var items = [];
@@ -88,7 +87,7 @@ function onDeviceReady() {
                 cadena = "<li><img src="+datosFB.image_url.replace("\/","/")+">"+
                          "<h3>" + datosFB.fullname + "</h3>"+
                          "<p>" + datosFB.followers_count +" Followers.</p></li>";
-                $("#fberlin").html(cadena).listview('refresh');
+                $("#fberlin").html(cadena).listview().listview('refresh');
             });
 
             elementos.forEach(function( val ) {
@@ -104,7 +103,7 @@ function onDeviceReady() {
                 }
                 cadena += "<a href=\"#capitulo\">" +
                          "<img src="+val.image_url.replace("\/","/")+">"+
-                         "<h3>" + val.title.substring(0, 50) + "</h3>"+
+                         "<h3>" + val.title + "</h3>"+
                          "<p>" + Math.floor((val.duration/1000)/60) +":"+ minutos + "</p>"+
                          "</a></li>";
                          //console.log(cadena);
@@ -114,13 +113,26 @@ function onDeviceReady() {
         }); // fin de getJSON
 
         $("#listado").delegate('.episodios','click',function(){
+            var milisegundosPorDia = 86400000;
+            var ahora = Date.now();
+            var dias;
+            var cadenaDias;
             posicion = this.id;
             episodio_id = elementos[posicion].episode_id;
             $.getJSON( "https://api.spreaker.com/v2/episodes/"+episodio_id, function( data ) {
-                var elementosCapitulo = data.response.episode;//.slice();
+                var elementosCapitulo = data.response.episode;
+                var fecha = new Date (elementosCapitulo.published_at);
+                dias = Math.floor((ahora - fecha.getTime())/milisegundosPorDia);
+                if (dias == 1) {
+                    cadenaDias = "Hace 1 dia"
+                }
+                else {
+                    cadenaDias = "Hace " + dias + " dias"
+                }
                 $("#imagen2").html("<img align=center src="+elementosCapitulo.image_url+" >");
-                $("#tituloPag2").html("<p><h2 align=\"center\">"+ elementosCapitulo.title + "</h2></p>");
-                $("#fechaEmision").html("<p><h3 align=\"center\">"+ elementosCapitulo.published_at + "</h3></p>");
+                //$("#tituloPag2").html("<p><h2 align=\"center\">"+ elementosCapitulo.title + "</h2></p><p><h3 align=\"center\">"+ elementosCapitulo.published_at + "</h3></p>");
+                $("#tituloPag2").html("<p><h2 align=\"center\">"+ elementosCapitulo.title + "</h2></p><p><h3 align=\"center\">"+ cadenaDias + "</h3></p>");
+           //     $("#fechaEmision").html("");
                 audio_en_rep = "https://api.spreaker.com/listen/episode/"+episodio_id+"/http";
                 reproductor = new Media(encodeURI(audio_en_rep), function(){console.log("comenzando reproduccion")},
                                                                  function(err){console.log("Error en reproduccion" + err.code)},
@@ -128,14 +140,17 @@ function onDeviceReady() {
                 titulo = elementosCapitulo.title;
                 imagen = elementosCapitulo.image_url.replace("\/","/");
                 enlaceEpisodio = "https://www.spreaker.com/episode/"+episodio_id;
+                tipoEmision = elementosCapitulo.type;
+                $("#slider-rep").slider("refresh");
             });
             $.getJSON( "https://api.spreaker.com/v2/episodes/"+episodio_id+"/messages", function( dataMsg ) {
                 var items = [];
-                var cadena ='';
+                var cadenaIni ='<thead><tr><th></th><th></th></tr></thead><tbody id="Chat">';
+                var cadena = '';
+                var cadenaFin = '</tbody>';
                 var i=0;
                 var imagenAutor;
                 mensaje = dataMsg.response.items.slice();
-                $("#Chat").empty();
                 mensaje.forEach(function( val ) {
                     if (val.author_image_url == null){
                         imagenAutor = 'img/logo.png';
@@ -143,14 +158,14 @@ function onDeviceReady() {
                     else {
                         imagenAutor = val.author_image_url;
                     }
-                    cadena = "<tr><td><img src="+imagenAutor+" width=\"50\" height=\"50\"></td>"+
+                    cadena += "<tr><td><img src="+imagenAutor+" width=\"50\" height=\"50\"></td>"+
                              "<td style=\"background-color:#ccc; margin:5px\"><b>" + val.author_fullname + "</b> ("+ val.created_at + ")" + //"<p class=\"ui-li-aside ui-li-count\">" + val.created_at + "</p>" +
                              "<p>" + val.text +"</p></td></tr>";
-                    $("#Chat").append(cadena);//.listview('refresh');
+                    //$("#Chat").append(cadena);
                 }); // fin de forEach
-                $("#tablaChat").table("rebuild");
+                $('<table>').attr({'data-role':'table','class':'ui-responsive table-stroke table-stripe',id:'tablaChat'}).html(cadenaIni+cadena+cadenaFin).appendTo("#Chat");
+                $("#tablaChat").table().table("refresh");
             }); //final getJSON (chat)
-            //$("#Chat").listview('refresh');
         }); // final click episodio
 
         $("#descarga").click(function(){
@@ -164,16 +179,19 @@ function onDeviceReady() {
             fileTransfer.onprogress = function(progressEvent) {
                 if (progressEvent.lengthComputable) {
             	    var perc = Math.floor(progressEvent.loaded / progressEvent.total * 100);
-            		$("#slider-descarga").val(perc).slider("refresh");
-                    $("#slider-descarga").closest(".ui-slider").find(".ui-slider-handle").text(perc+"%");
+            		//$("#slider-descarga").val(perc).slider("refresh");
+                    //$("#slider-descarga").closest(".ui-slider").find(".ui-slider-handle").text(perc+"%");
+                    document.getElementById("slider-descarga").value = perc;
             	}
             }; // fin onprogress
 
             if (!descargando){
                 descargando = true;
                 console.log("Comenzando la descarga del fichero "+ enlaceEpisodio);
+                document.getElementById("slider-descarga").value = 0;
+                $('#slider-descarga').show();
 
-                document.getElementById("barra_descarga").style.display = 'block';
+                //document.getElementById("barra_descarga").style.display = 'block';
 
                 fileTransfer.download(
                     uri, fileURL, function(entry) {
@@ -185,8 +203,9 @@ function onDeviceReady() {
                     console.log("download error code" + error.code);
                     // ESto lo pongo aquí porque cuando cancelo la descarga la ejecución pasa por aquí. Así nos aseguramos de verdad de que la descarga ha terminado.
                     descargando = false;
-                    $("#slider-descarga").closest(".ui-slider").find(".ui-slider-handle").text("0 %");
-                    document.getElementById("barra_descarga").style.display = 'none';
+                    //$("#slider-descarga").closest(".ui-slider").find(".ui-slider-handle").text("0 %");
+                    //document.getElementById("barra_descarga").style.display = 'none';
+                    $('#slider-descarga').hide();
                 },
                 false, {
                     headers: {
@@ -203,9 +222,15 @@ function onDeviceReady() {
 
         $("#buttonPlay").click(function(){
             console.log ("Estado rep "  + reproduciendo);
-            if (reproduciendo == Media.MEDIA_RUNNING ) {
-                reproductor.pause();
-                console.log ("Reproductor en Pausa");
+            if (reproduciendo == Media.MEDIA_RUNNING || reproduciendo == Media.MEDIA_STARTING ) {
+                if (tipoEmision == "LIVE") {
+                    reproductor.stop();
+                    console.log ("Reproductor Parado");
+                }
+                else {
+                    reproductor.pause();
+                    console.log ("Reproductor en Pausa");
+                }
                // $("#buttonPlay").html("Play") ;
                 reproduciendo = false;
                 clearInterval(pos_reproduccion);
