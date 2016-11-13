@@ -1,6 +1,7 @@
 # Non-project-specific build files:
 build.xml
 local.properties
+.gradle
 /gradlew
 /gradlew.bat
 /gradle
@@ -12,3 +13,4 @@ gen
 out
 # Gradle builds
 /build
+/CordovaLib/build
