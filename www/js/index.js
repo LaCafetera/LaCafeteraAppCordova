@@ -57,10 +57,46 @@ function onDeviceReady() {
    inicializa();
 }
 
+    function ficheroExiste2 (fichero){
+        var lector = new FileReader();
+        var existe = true;
+        console.log("El fichero es:" + fichero);
+
+        lector.onloadend = function(evt) {
+            if(evt.target.result == null) {
+               existe = false;
+            }
+        };
+        lector.readAsDataURL(fichero);
+        console.log("El fichero existe:" + existe);
+        return (existe);
+    }
+
+
+    function ficheroExiste(fichero){
+        window.resolveLocalFileSystemURL(cordova.file.dataDirectory, function(fileSystem){
+            fileSystem.getFile(fichero, { create: false }, fileExists, fileDoesNotExist);
+        }, getFSFail); //of requestFileSystem
+    }
+    function fileExists(fileEntry){
+        console.log("File " + fileEntry.fullPath + " exists!");
+        return (true);
+    }
+    function fileDoesNotExist(){
+        console.log("file does not exist");
+        return (false);
+    }
+    function getFSFail(evt) {
+        console.log(evt.target.error.code);
+        alert("Errorrrr");
+        return (false);
+    }
+
 
    function inicializa(){
         var elementos;
         var audio_en_rep="0";
+        var fichero_en_rep = "";
         var enlace = "";
         var posicion=0;
         var reproductor;
@@ -76,6 +112,29 @@ function onDeviceReady() {
         $("#barra_reprod").find('.ui-slider-track').css('margin','0 15px 0 15px');
         $('#slider-descarga').hide();
         //document.getElementById("barra_descarga").style.display = 'none';
+
+
+        function inicializaReproductor(fichero){
+            window.resolveLocalFileSystemURL(cordova.file.dataDirectory, function(fileSystem){
+                fileSystem.getFile(fichero, { create: false }, fileExists, fileDoesNotExist);
+            }, getFSFail); //of requestFileSystem
+        }
+        function fileExists(fileEntry){
+            console.log("Preparado para reproduccion fichero local " + fichero_en_rep);
+            reproductor = new Media(encodeURI(fichero_en_rep), function(){console.log("comenzando reproduccion fichero local")},
+                                                             function(err){console.log("Error en reproduccion" + err.code)},
+                                                             function(msg){reproduciendo = msg});
+        }
+        function fileDoesNotExist(){
+            console.log("Preparado para reproduccion streaming " + audio_en_rep);
+            reproductor = new Media(encodeURI(audio_en_rep), function(){console.log("comenzando reproduccion streaming")},
+                                                             function(err){console.log("Error en reproduccion" + err.code)},
+                                                             function(msg){reproduciendo = msg});
+        }
+        function getFSFail(evt) {
+            console.log(evt.target.error.code);
+            alert("Errorrrr");
+        }
 
         $.getJSON( "https://api.spreaker.com/v2/shows/1060718/episodes", function( data ) { //?limit=15
             var items = [];
@@ -134,9 +193,8 @@ function onDeviceReady() {
                 $("#tituloPag2").html("<p><h2 align=\"center\">"+ elementosCapitulo.title + "</h2></p><p><h3 align=\"center\">"+ cadenaDias + "</h3></p>");
            //     $("#fechaEmision").html("");
                 audio_en_rep = "https://api.spreaker.com/listen/episode/"+episodio_id+"/http";
-                reproductor = new Media(encodeURI(audio_en_rep), function(){console.log("comenzando reproduccion")},
-                                                                 function(err){console.log("Error en reproduccion" + err.code)},
-                                                                 function(msg){reproduciendo = msg});
+                fichero_en_rep = cordova.file.dataDirectory + episodio_id + ".mp3";
+                inicializaReproductor (episodio_id + ".mp3");
                 titulo = elementosCapitulo.title;
                 imagen = elementosCapitulo.image_url.replace("\/","/");
                 enlaceEpisodio = "https://www.spreaker.com/episode/"+episodio_id;
@@ -223,18 +281,14 @@ function onDeviceReady() {
         $("#buttonPlay").click(function(){
             console.log ("Estado rep "  + reproduciendo);
             if (reproduciendo == Media.MEDIA_RUNNING || reproduciendo == Media.MEDIA_STARTING ) {
-                if (tipoEmision == "LIVE") {
-                    reproductor.stop();
-                    console.log ("Reproductor Parado");
-                }
-                else {
-                    reproductor.pause();
-                    console.log ("Reproductor en Pausa");
-                }
+                reproductor.pause();
                // $("#buttonPlay").html("Play") ;
                 reproduciendo = false;
                 clearInterval(pos_reproduccion);
             } else {
+                if (tipoEmision == "LIVE") {
+                    reproductor.seek(reproductor.getDuration()*1000);
+                }
                 reproductor.play();
                 pos_reproduccion = setInterval(function () {
                                        // get media position
