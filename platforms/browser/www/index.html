@@ -11,6 +11,7 @@
 
     <meta http-equiv="Content-Security-Policy" content="default-src &apos;self&apos; data: gap: https://ssl.gstatic.com &apos;unsafe-eval&apos;; style-src &apos;self&apos; &apos;unsafe-inline&apos;; media-src *">
     -->    <meta name="format-detection" content="telephone=no">
+
 	<meta name="msapplication-tap-highlight" content="no">
 	<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
 
@@ -33,36 +34,65 @@
 
 <body>
 
-<!----------------------------------------- Página 1 (listado capítulos). --------------------------------------------------->
+<!----------------------------------------- Página 1a (listado capítulos). --------------------------------------------------->
 
-<div data-role="page" id="index">
-	<header data-role="header" class="cabecera" data-position="fixed"> <!--  style="background-color:#444444;" > -->
+<div data-role="page" id="capitulos">
+	<div data-role="header" class="cabecera" data-position="fixed"> <!--  style="background-color:#444444;" > -->
+		<h1> La Cafetera de Radiocable</h1>
 		<img class="logo" src="img/cafetera.png" />
-	</header>
-
-	<!--<p><a href="#capitulo" data-role="button" data-theme="c">Reproducir</a></p>-->
-	<div data-role="content">
-		<ul data-role="listview" class = "my-new-list" id= "listado">
-		</ul>
 	</div>
 
-	<div data-role="footer" data-position="fixed" style="background-color:#444444;" >
+	<div data-role="main" class="ui-content">
 		<div data-role="navbar">
 			<ul>
-				<li><a href="#">PISTAS</a></li>
-				<li><a href="#pantalla3">INFO</a></li>
+				<li><a href="#" class="ui-btn-active ui-state-persist">PISTAS</a></li>
+				<li><a href="#pinfoFer">INFO</a></li>
 			</ul>
 		</div>
-		<!--     <h2>&copy; radiocable.com</h2> -->
+		<div data-role="content">
+			<div id="capitulos">
+				<ul data-role="listview" class = "my-new-list" id= "listado"></ul>
+			</div>
+		</div>
 	</div>
+</div>
+<!----------------------------------------- Página 1b (info Fernando). --------------------------------------------------->
+
+<div data-role="page" id="pinfoFer">
+	<div data-role="header" class="cabecera" data-position="fixed"> <!--  style="background-color:#444444;" > -->
+		<h1> La Cafetera de Radiocable</h1>
+		<img class="logo" src="img/cafetera.png" />
+	</div>
+
+	<div data-role="main" class="ui-content">
+		<div data-role="navbar">
+			<ul>
+				<li><a href="#capitulos" >PISTAS</a></li>
+				<li><a href="#" class="ui-btn-active ui-state-persist">INFO</a></li>
+			</ul>
+		</div>
+		<div data-role="content">
+			<ul data-role="listview" class = "my-new-list" id="fberlin"></ul>
+			<div data-role="content">
+				<p>LaCafetera de <a href="www.radiocable.com">radiocable.com</a>. Dirige Fernando Berlín</p>
+				<p>Programa de radio en directo y en diferido.</p>
+				<p>Pionera emisora de radio por internet. Nació el 14 de mayo de 1.997 emitiendo desde un domicilio. Premio Ondas y del Club internacional de prensa.</p>
+				<a href='https://play.google.com/store/apps/details?id=com.spreaker.custom.prod.app_6243'><img src="./js/images/google-play-icon.png"></a>
+			</div>
+		</div>
+
+	</div>
+
+</div>
 </div>
 
 <!----------------------------------------- Página 2 (Capítulo en reproducción)  --------------------------------------------------->
 
 <div data-role="page" id="capitulo">
-	<header data-role="header" class="cabecera" data-position="fixed"> <!--  style="background-color:#444444;" > -->
+	<div data-role="header" class="cabecera" data-position="fixed" data-add-back-btn="true"  data-theme="a">
 		<h1> La Cafetera de Radiocable</h1>
-	</header>
+		<!--    <div><img class="logo" src="img/cafetera.png" /></div> -->
+	</div>
 	<div data-role="content">
 		<div data-role="content" id="imagen2">
 		</div>
@@ -75,47 +105,21 @@
 				<button class="ui-btn ui-btn-inline ui-icon-mail ui-btn-icon-notext" id="buttonComparte"></button>
 				<a href="#pantallaChat" class="ui-btn ui-btn-inline ui-icon-comment ui-btn-icon-notext"></a>
 			</fiedset>
+			<progress max="100" value="0" id="slider-descarga" class="progress-bar-striped">0</progress>
 		</div>
-		<div data-role="content" id="barra_reprod" name="barra">
-			<input type="range" name="slider-rep" id="slider-rep" value="0" min="0" max="100" data-highlight="true" type="range">
+		<div data-role="fieldcontain" id="barra_reprod" name="barra">
+			<label for="slider-rep" id="slider-rep-lab">00:00:00</label>
+			<input type="range" name="slider-rep" id="slider-rep" value="0" min="0" max="100" data-highlight="true" type="range" align=center>
 		</div>
-		<div data-role="content" id="barra_descarga" name="barra">
-			<input type="range" name="slider-fill" id="slider-descarga" value="0" min="0" max="100" data-highlight="true" type="range" style="margin-left:15px">
-		</div>
+		<!--	<input type="range" name="slider-fill" id="slider-descarga" value="0" min="0" max="100" data-highlight="true" type="range" style="margin-left:15px"> -->
 		<div data-role="content" id="tituloPag2"></div>
 		<div data-role="content" id="fechaEmision"></div>
 
 
-		<p><a href="#" data-role="button" data-theme="c" data-rel="back">Volver a la lista</a></p>
+		<!--	<p><a href="#" data-role="button" data-theme="c" data-rel="back">Volver a la lista</a></p> -->
 	</div>
 </div>
 
-<!----------------------------------------- Página 3 (Datos La Cafetera) --------------------------------------------------->
-
-<div data-role="page" id="pantalla3">
-	<header data-role="header" class="cabecera" data-position="fixed"> <!--  style="background-color:#444444;" > -->
-		<img class="logo" src="img/cafetera.png" />
-	</header>
-	<div data-role="content">
-		<ul data-role="listview" class = "my-new-list" id="fberlin"></ul>
-	</div>
-	<div data-role="content" id="descFBerlin">
-		<p>LaCafetera de <a href="www.radiocable.com">radiocable.com</a>. Dirige Fernando Berlín</p>
-		<p>Programa de radio en directo y en diferido.</p>
-		<p>Pionera emisora de radio por internet. Nació el 14 de mayo de 1.997 emitiendo desde un domicilio. Premio Ondas y del Club internacional de prensa.</p>
-		<a href='https://play.google.com/store/apps/details?id=com.spreaker.custom.prod.app_6243'><img src="./js/images/google-play-icon.png"></a>
-	</div>
-
-	<div data-role="footer" data-position="fixed" style="background-color:#444444;" >
-		<div data-role="navbar">
-			<ul>
-				<li><a href="#" data-rel="back" >PISTAS</a></li>
-				<li><a href="#">INFO</a></li>
-			</ul>
-		</div>
-		<!--     <h2>&copy; radiocable.com</h2> -->
-	</div>
-</div>
 
 <!----------------------------------------- Página 4 (Chat) --------------------------------------------------->
 <style type="text/css">
@@ -129,27 +133,16 @@
          }
     </style>
 <div data-role="page"id="pantallaChat">
-	<header data-role="header" class="cabecera" data-position="fixed"> <!--  style="background-color:#444444;" > -->
-		<img class="logo" src="img/cafetera.png" />
+	<header data-role="header" class="cabecera" data-position="fixed" data-add-back-btn="true">
+		<h1> La Cafetera de Radiocable</h1>
 	</header>
-	<div data-role="main">
-		<table data-role="table" class="ui-responsive table-stroke table-stripe" id="tablaChat">
-			<thead>
-			<tr>
-				<th></th>
-				<th></th>
-			</tr>
-			</thead>
-			<tbody id="Chat">
-			</tbody>
-		</table>
+	<div data-role="main" id="Chat">
+		<!--<table data-role="table" class="ui-responsive table-stroke table-stripe" ><thead><tr><th></th><th></th></tr></thead><tbody id="Chat">-->
+		<!--</tbody></table>-->
 	</div>
 	<footer data-role="footer" data-position="fixed"> <!--  style="background-color:#444444;" > -->
-		<a href="#" data-rel="back" >Volver</a>
+		<!--	<a href="#" data-rel="back" >Volver</a> -->
 	</footer>
-</div>
-<div data-role="footer" data-position="fixed" style="background-color:#444444;" >
-
 </div>
 </body>
 <!-- end page 2 -->
@@ -166,7 +159,8 @@
 
 		</script>
 
-<script type="text/javascript" src="js/jquery-1.5.0.mobile.min.js"></script><script type="text/javascript" src="js/index.js"></script>
+<script type="text/javascript" src="js/jquery-1.5.0.mobile.min.js"></script>
+<script type="text/javascript" src="js/index.js"></script>
 <script type="text/javascript" id="jqm-trans-disable">
 /*inicializa();Esto para probar en navegadores pc. Lo comento porque así se ejecuta dos veces y da problemas*/
 

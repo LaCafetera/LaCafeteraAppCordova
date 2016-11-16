@@ -11,6 +11,7 @@
 
     <meta http-equiv="Content-Security-Policy" content="default-src &apos;self&apos; data: gap: https://ssl.gstatic.com &apos;unsafe-eval&apos;; style-src &apos;self&apos; &apos;unsafe-inline&apos;; media-src *">
     -->    <meta name="format-detection" content="telephone=no">
+
 	<meta name="msapplication-tap-highlight" content="no">
 	<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
 
@@ -106,7 +107,8 @@
 			</fiedset>
 			<progress max="100" value="0" id="slider-descarga" class="progress-bar-striped">0</progress>
 		</div>
-		<div data-role="content" id="barra_reprod" name="barra">
+		<div data-role="fieldcontain" id="barra_reprod" name="barra">
+			<label for="slider-rep" id="slider-rep-lab">00:00:00</label>
 			<input type="range" name="slider-rep" id="slider-rep" value="0" min="0" max="100" data-highlight="true" type="range" align=center>
 		</div>
 		<!--	<input type="range" name="slider-fill" id="slider-descarga" value="0" min="0" max="100" data-highlight="true" type="range" style="margin-left:15px"> -->

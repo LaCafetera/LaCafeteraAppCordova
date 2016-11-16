@@ -111,7 +111,26 @@ function onDeviceReady() {
         $("#barra_reprod").find('input').css('margin-left','15px'); // Fix for some FF versions
         $("#barra_reprod").find('.ui-slider-track').css('margin','0 15px 0 15px');
         $('#slider-descarga').hide();
-        //document.getElementById("barra_descarga").style.display = 'none';
+
+        function numerosDosCifras( numero) {
+            var ret = "00";
+            if (!isNaN(numero)){
+                if (numero < 10){
+                    ret = '0' + numero;
+                }
+                else {
+                    ret = numero.toString();
+                }
+            }
+            return (ret);
+        }
+
+        function dameTiempo(totSegundos){
+            var horas = Math.floor(totSegundos / 3600);
+            var minutos = Math.floor((totSegundos % 3600) / 60);
+            var segundos = (totSegundos % 60);
+            return (numerosDosCifras (horas) + ':' + numerosDosCifras (minutos) + ':' + numerosDosCifras (segundos));
+        }
 
 
         function inicializaReproductor(fichero){
@@ -120,13 +139,13 @@ function onDeviceReady() {
             }, getFSFail); //of requestFileSystem
         }
         function fileExists(fileEntry){
-            console.log("Preparado para reproduccion fichero local " + fichero_en_rep);
+            $("#descarga").removeClass("ui-icon-arrow-d ui-icon-cloud").addClass("ui-icon-cloud");
             reproductor = new Media(encodeURI(fichero_en_rep), function(){console.log("comenzando reproduccion fichero local")},
                                                              function(err){console.log("Error en reproduccion" + err.code)},
                                                              function(msg){reproduciendo = msg});
         }
         function fileDoesNotExist(){
-            console.log("Preparado para reproduccion streaming " + audio_en_rep);
+            $("#descarga").removeClass("ui-icon-arrow-d ui-icon-cloud").addClass("ui-icon-arrow-d");
             reproductor = new Media(encodeURI(audio_en_rep), function(){console.log("comenzando reproduccion streaming")},
                                                              function(err){console.log("Error en reproduccion" + err.code)},
                                                              function(msg){reproduciendo = msg});
@@ -151,19 +170,11 @@ function onDeviceReady() {
 
             elementos.forEach(function( val ) {
                 titulo = val.title;
-                var minutos =  Math.round((val.duration/1000)%60).toString();
-                if (minutos.length == 1) {
-                    minutos = '0'+minutos
-                }
-                if (i == 0) {
-                    cadena = "<li class=\"episodios\" id=\"" + i++ + "\">";
-                } else {
-                    cadena = "<li class=\"episodios\" id=\"" + i++ + "\" data-mini=\"true\">";
-                }
-                cadena += "<a href=\"#capitulo\">" +
+                cadena = "<li class=\"episodios\" id=\"" + i++ + "\">" +
+                         "<a href=\"#capitulo\">" +
                          "<img src="+val.image_url.replace("\/","/")+">"+
                          "<h3>" + val.title + "</h3>"+
-                         "<p>" + Math.floor((val.duration/1000)/60) +":"+ minutos + "</p>"+
+                         "<p>" + dameTiempo(Math.floor(val.duration/1000)) + "</p>"+
                          "</a></li>";
                          //console.log(cadena);
                 $("#listado").append(cadena);
@@ -226,6 +237,9 @@ function onDeviceReady() {
             }); //final getJSON (chat)
         }); // final click episodio
 
+        $( "#slider-rep" ).on( 'slidestart', function(event) {alert ("kietorrla")} );
+        $( "#slider-rep" ).on( 'slidestop', function(event) {alert ("kietorrl")} );
+
         $("#descarga").click(function(){
             episodio_id = elementos[posicion].episode_id;
             var audio_en_desc = "https://api.spreaker.com/download/episode/"+episodio_id+"/.mp3";
@@ -251,25 +265,27 @@ function onDeviceReady() {
 
                 //document.getElementById("barra_descarga").style.display = 'block';
 
-                fileTransfer.download(
-                    uri, fileURL, function(entry) {
-                    console.log("Descargando ");
-                },
-                function(error) {
-                    console.log("download error source " + error.source);
-                    console.log("download error target " + error.target);
-                    console.log("download error code" + error.code);
-                    // ESto lo pongo aquí porque cuando cancelo la descarga la ejecución pasa por aquí. Así nos aseguramos de verdad de que la descarga ha terminado.
-                    descargando = false;
-                    //$("#slider-descarga").closest(".ui-slider").find(".ui-slider-handle").text("0 %");
-                    //document.getElementById("barra_descarga").style.display = 'none';
-                    $('#slider-descarga').hide();
-                },
-                false, {
-                    headers: {
-                        "Authorization": "Basic dGVzdHVzZXJuYW1lOnRlc3RwYXNzd29yZA=="
-                    }
-                })
+                fileTransfer.download( uri, fileURL,
+                    function(entry) {
+                        alert("Descargarga completa.");
+                        $('#slider-descarga').hide();
+                        inicializaReproductor (episodio_id + ".mp3");
+                    },
+                    function(error) {
+                        console.log("download error source " + error.source);
+                        console.log("download error target " + error.target);
+                        console.log("download error code" + error.code);
+                        // ESto lo pongo aquí porque cuando cancelo la descarga la ejecución pasa por aquí. Así nos aseguramos de verdad de que la descarga ha terminado.
+                        descargando = false;
+                        //$("#slider-descarga").closest(".ui-slider").find(".ui-slider-handle").text("0 %");
+                        //document.getElementById("barra_descarga").style.display = 'none';
+                        $('#slider-descarga').hide();
+                    },
+                    false, {
+                        headers: {
+                            "Authorization": "Basic dGVzdHVzZXJuYW1lOnRlc3RwYXNzd29yZA=="
+                        }
+                    })
             }
             else {
                 fileTransfer.abort();
@@ -295,11 +311,12 @@ function onDeviceReady() {
                                        reproductor.getCurrentPosition(
                                            // success callback
                                            function (position) {
-                                               if (position > -1) {
-                                                    console.log((position) + " sec");
-                                                    $("#slider-rep").closest(".ui-slider").find(".ui-slider-handle").text(position + "%");
-                                                    console.log ("Reproductor por " + position);
-                                               }
+                                                if (position > -1) {
+                                                    var posicion = dameTiempo(Math.round(position));
+                                                    console.log ("Reproductor por " + posicion);
+                                                    $("#slider-rep").closest(".ui-slider").find(".ui-slider-handle").text(posicion);
+                                                    $("#slider-rep-lab").html(posicion);
+                                                }
                                            },
                                            // error callback
                                            function (e) {

@@ -57,10 +57,46 @@ function onDeviceReady() {
    inicializa();
 }
 
+    function ficheroExiste2 (fichero){
+        var lector = new FileReader();
+        var existe = true;
+        console.log("El fichero es:" + fichero);
+
+        lector.onloadend = function(evt) {
+            if(evt.target.result == null) {
+               existe = false;
+            }
+        };
+        lector.readAsDataURL(fichero);
+        console.log("El fichero existe:" + existe);
+        return (existe);
+    }
+
+
+    function ficheroExiste(fichero){
+        window.resolveLocalFileSystemURL(cordova.file.dataDirectory, function(fileSystem){
+            fileSystem.getFile(fichero, { create: false }, fileExists, fileDoesNotExist);
+        }, getFSFail); //of requestFileSystem
+    }
+    function fileExists(fileEntry){
+        console.log("File " + fileEntry.fullPath + " exists!");
+        return (true);
+    }
+    function fileDoesNotExist(){
+        console.log("file does not exist");
+        return (false);
+    }
+    function getFSFail(evt) {
+        console.log(evt.target.error.code);
+        alert("Errorrrr");
+        return (false);
+    }
+
 
    function inicializa(){
         var elementos;
         var audio_en_rep="0";
+        var fichero_en_rep = "";
         var enlace = "";
         var posicion=0;
         var reproductor;
@@ -69,14 +105,55 @@ function onDeviceReady() {
         var titulo ;
         var fileTransfer;// = new FileTransfer();
         var pos_reproduccion;
+        var tipoEmision;
 
-        $(".barra").find('input').hide();
-        $(".barra").find('input').css('margin-left','15px'); // Fix for some FF versions
-        $(".barra").find('.ui-slider-track').css('margin','0 15px 0 15px');
-        $(".barra").find('.ui-slider-handle').hide();
-        $('.slider').slider();
-        //$("#slider-descarga").slider("refresh");
-        document.getElementById("barra_descarga").style.display = 'none';
+        $("#barra_reprod").find('input').hide();
+        $("#barra_reprod").find('input').css('margin-left','15px'); // Fix for some FF versions
+        $("#barra_reprod").find('.ui-slider-track').css('margin','0 15px 0 15px');
+        $('#slider-descarga').hide();
+
+        function numerosDosCifras( numero) {
+            var ret = "00";
+            if (!isNaN(numero)){
+                if (numero < 10){
+                    ret = '0' + numero;
+                }
+                else {
+                    ret = numero.toString();
+                }
+            }
+            return (ret);
+        }
+
+        function dameTiempo(totSegundos){
+            var horas = Math.floor(totSegundos / 3600);
+            var minutos = Math.floor((totSegundos % 3600) / 60);
+            var segundos = (totSegundos % 60);
+            return (numerosDosCifras (horas) + ':' + numerosDosCifras (minutos) + ':' + numerosDosCifras (segundos));
+        }
+
+
+        function inicializaReproductor(fichero){
+            window.resolveLocalFileSystemURL(cordova.file.dataDirectory, function(fileSystem){
+                fileSystem.getFile(fichero, { create: false }, fileExists, fileDoesNotExist);
+            }, getFSFail); //of requestFileSystem
+        }
+        function fileExists(fileEntry){
+            console.log("Preparado para reproduccion fichero local " + fichero_en_rep);
+            reproductor = new Media(encodeURI(fichero_en_rep), function(){console.log("comenzando reproduccion fichero local")},
+                                                             function(err){console.log("Error en reproduccion" + err.code)},
+                                                             function(msg){reproduciendo = msg});
+        }
+        function fileDoesNotExist(){
+            console.log("Preparado para reproduccion streaming " + audio_en_rep);
+            reproductor = new Media(encodeURI(audio_en_rep), function(){console.log("comenzando reproduccion streaming")},
+                                                             function(err){console.log("Error en reproduccion" + err.code)},
+                                                             function(msg){reproduciendo = msg});
+        }
+        function getFSFail(evt) {
+            console.log(evt.target.error.code);
+            alert("Errorrrr");
+        }
 
         $.getJSON( "https://api.spreaker.com/v2/shows/1060718/episodes", function( data ) { //?limit=15
             var items = [];
@@ -88,24 +165,16 @@ function onDeviceReady() {
                 cadena = "<li><img src="+datosFB.image_url.replace("\/","/")+">"+
                          "<h3>" + datosFB.fullname + "</h3>"+
                          "<p>" + datosFB.followers_count +" Followers.</p></li>";
-                $("#fberlin").html(cadena).listview('refresh');
+                $("#fberlin").html(cadena).listview().listview('refresh');
             });
 
             elementos.forEach(function( val ) {
                 titulo = val.title;
-                var minutos =  Math.round((val.duration/1000)%60).toString();
-                if (minutos.length == 1) {
-                    minutos = '0'+minutos
-                }
-                if (i == 0) {
-                    cadena = "<li class=\"episodios\" id=\"" + i++ + "\">";
-                } else {
-                    cadena = "<li class=\"episodios\" id=\"" + i++ + "\" data-mini=\"true\">";
-                }
-                cadena += "<a href=\"#capitulo\">" +
+                cadena = "<li class=\"episodios\" id=\"" + i++ + "\">" +
+                         "<a href=\"#capitulo\">" +
                          "<img src="+val.image_url.replace("\/","/")+">"+
-                         "<h3>" + val.title.substring(0, 50) + "</h3>"+
-                         "<p>" + Math.floor((val.duration/1000)/60) +":"+ minutos + "</p>"+
+                         "<h3>" + val.title + "</h3>"+
+                         "<p>" + dameTiempo(Math.floor(val.duration/1000)) + "</p>"+
                          "</a></li>";
                          //console.log(cadena);
                 $("#listado").append(cadena);
@@ -114,28 +183,43 @@ function onDeviceReady() {
         }); // fin de getJSON
 
         $("#listado").delegate('.episodios','click',function(){
+            var milisegundosPorDia = 86400000;
+            var ahora = Date.now();
+            var dias;
+            var cadenaDias;
             posicion = this.id;
             episodio_id = elementos[posicion].episode_id;
             $.getJSON( "https://api.spreaker.com/v2/episodes/"+episodio_id, function( data ) {
-                var elementosCapitulo = data.response.episode;//.slice();
+                var elementosCapitulo = data.response.episode;
+                var fecha = new Date (elementosCapitulo.published_at);
+                dias = Math.floor((ahora - fecha.getTime())/milisegundosPorDia);
+                if (dias == 1) {
+                    cadenaDias = "Hace 1 dia"
+                }
+                else {
+                    cadenaDias = "Hace " + dias + " dias"
+                }
                 $("#imagen2").html("<img align=center src="+elementosCapitulo.image_url+" >");
-                $("#tituloPag2").html("<p><h2 align=\"center\">"+ elementosCapitulo.title + "</h2></p>");
-                $("#fechaEmision").html("<p><h3 align=\"center\">"+ elementosCapitulo.published_at + "</h3></p>");
+                //$("#tituloPag2").html("<p><h2 align=\"center\">"+ elementosCapitulo.title + "</h2></p><p><h3 align=\"center\">"+ elementosCapitulo.published_at + "</h3></p>");
+                $("#tituloPag2").html("<p><h2 align=\"center\">"+ elementosCapitulo.title + "</h2></p><p><h3 align=\"center\">"+ cadenaDias + "</h3></p>");
+           //     $("#fechaEmision").html("");
                 audio_en_rep = "https://api.spreaker.com/listen/episode/"+episodio_id+"/http";
-                reproductor = new Media(encodeURI(audio_en_rep), function(){console.log("comenzando reproduccion")},
-                                                                 function(err){console.log("Error en reproduccion" + err.code)},
-                                                                 function(msg){reproduciendo = msg});
+                fichero_en_rep = cordova.file.dataDirectory + episodio_id + ".mp3";
+                inicializaReproductor (episodio_id + ".mp3");
                 titulo = elementosCapitulo.title;
                 imagen = elementosCapitulo.image_url.replace("\/","/");
                 enlaceEpisodio = "https://www.spreaker.com/episode/"+episodio_id;
+                tipoEmision = elementosCapitulo.type;
+                $("#slider-rep").slider("refresh");
             });
             $.getJSON( "https://api.spreaker.com/v2/episodes/"+episodio_id+"/messages", function( dataMsg ) {
                 var items = [];
-                var cadena ='';
+                var cadenaIni ='<thead><tr><th></th><th></th></tr></thead><tbody id="Chat">';
+                var cadena = '';
+                var cadenaFin = '</tbody>';
                 var i=0;
                 var imagenAutor;
                 mensaje = dataMsg.response.items.slice();
-                $("#Chat").empty();
                 mensaje.forEach(function( val ) {
                     if (val.author_image_url == null){
                         imagenAutor = 'img/logo.png';
@@ -143,15 +227,19 @@ function onDeviceReady() {
                     else {
                         imagenAutor = val.author_image_url;
                     }
-                    cadena = "<tr><td><img src="+imagenAutor+" width=\"50\" height=\"50\"></td>"+
+                    cadena += "<tr><td><img src="+imagenAutor+" width=\"50\" height=\"50\"></td>"+
                              "<td style=\"background-color:#ccc; margin:5px\"><b>" + val.author_fullname + "</b> ("+ val.created_at + ")" + //"<p class=\"ui-li-aside ui-li-count\">" + val.created_at + "</p>" +
                              "<p>" + val.text +"</p></td></tr>";
-                    $("#Chat").append(cadena);//.listview('refresh');
+                    //$("#Chat").append(cadena);
                 }); // fin de forEach
-                $("#tablaChat").table("rebuild");
+                $('<table>').attr({'data-role':'table','class':'ui-responsive table-stroke table-stripe',id:'tablaChat'}).html(cadenaIni+cadena+cadenaFin).appendTo("#Chat");
+                $("#tablaChat").table().table("refresh");
             }); //final getJSON (chat)
-            //$("#Chat").listview('refresh');
         }); // final click episodio
+
+
+
+        $( "#slider-rep" ).on( "change", function() {alert ("kietorrl")} );
 
         $("#descarga").click(function(){
             episodio_id = elementos[posicion].episode_id;
@@ -164,35 +252,41 @@ function onDeviceReady() {
             fileTransfer.onprogress = function(progressEvent) {
                 if (progressEvent.lengthComputable) {
             	    var perc = Math.floor(progressEvent.loaded / progressEvent.total * 100);
-            		$("#slider-descarga").val(perc).slider("refresh");
-                    $("#slider-descarga").closest(".ui-slider").find(".ui-slider-handle").text(perc+"%");
+            		//$("#slider-descarga").val(perc).slider("refresh");
+                    //$("#slider-descarga").closest(".ui-slider").find(".ui-slider-handle").text(perc+"%");
+                    document.getElementById("slider-descarga").value = perc;
             	}
             }; // fin onprogress
 
             if (!descargando){
                 descargando = true;
                 console.log("Comenzando la descarga del fichero "+ enlaceEpisodio);
+                document.getElementById("slider-descarga").value = 0;
+                $('#slider-descarga').show();
 
-                document.getElementById("barra_descarga").style.display = 'block';
+                //document.getElementById("barra_descarga").style.display = 'block';
 
-                fileTransfer.download(
-                    uri, fileURL, function(entry) {
-                    console.log("Descargando ");
-                },
-                function(error) {
-                    console.log("download error source " + error.source);
-                    console.log("download error target " + error.target);
-                    console.log("download error code" + error.code);
-                    // ESto lo pongo aquí porque cuando cancelo la descarga la ejecución pasa por aquí. Así nos aseguramos de verdad de que la descarga ha terminado.
-                    descargando = false;
-                    $("#slider-descarga").closest(".ui-slider").find(".ui-slider-handle").text("0 %");
-                    document.getElementById("barra_descarga").style.display = 'none';
-                },
-                false, {
-                    headers: {
-                        "Authorization": "Basic dGVzdHVzZXJuYW1lOnRlc3RwYXNzd29yZA=="
-                    }
-                })
+                fileTransfer.download( uri, fileURL,
+                    function(entry) {
+                        alert("Descargarga completa.");
+                        $('#slider-descarga').hide();
+                        inicializaReproductor (episodio_id + ".mp3");
+                    },
+                    function(error) {
+                        console.log("download error source " + error.source);
+                        console.log("download error target " + error.target);
+                        console.log("download error code" + error.code);
+                        // ESto lo pongo aquí porque cuando cancelo la descarga la ejecución pasa por aquí. Así nos aseguramos de verdad de que la descarga ha terminado.
+                        descargando = false;
+                        //$("#slider-descarga").closest(".ui-slider").find(".ui-slider-handle").text("0 %");
+                        //document.getElementById("barra_descarga").style.display = 'none';
+                        $('#slider-descarga').hide();
+                    },
+                    false, {
+                        headers: {
+                            "Authorization": "Basic dGVzdHVzZXJuYW1lOnRlc3RwYXNzd29yZA=="
+                        }
+                    })
             }
             else {
                 fileTransfer.abort();
@@ -203,24 +297,27 @@ function onDeviceReady() {
 
         $("#buttonPlay").click(function(){
             console.log ("Estado rep "  + reproduciendo);
-            if (reproduciendo == Media.MEDIA_RUNNING ) {
+            if (reproduciendo == Media.MEDIA_RUNNING || reproduciendo == Media.MEDIA_STARTING ) {
                 reproductor.pause();
-                console.log ("Reproductor en Pausa");
                // $("#buttonPlay").html("Play") ;
                 reproduciendo = false;
                 clearInterval(pos_reproduccion);
             } else {
+                if (tipoEmision == "LIVE") {
+                    reproductor.seek(reproductor.getDuration()*1000);
+                }
                 reproductor.play();
                 pos_reproduccion = setInterval(function () {
                                        // get media position
                                        reproductor.getCurrentPosition(
                                            // success callback
                                            function (position) {
-                                               if (position > -1) {
-                                                    console.log((position) + " sec");
-                                                    $("#slider-rep").closest(".ui-slider").find(".ui-slider-handle").text(position + "%");
-                                                    console.log ("Reproductor por " + position);
-                                               }
+                                                if (position > -1) {
+                                                    var posicion = dameTiempo(Math.round(position));
+                                                    console.log ("Reproductor por " + posicion);
+                                                    $("#slider-rep").closest(".ui-slider").find(".ui-slider-handle").text(posicion);
+                                                    $("#slider-rep-lab").html(posicion);
+                                                }
                                            },
                                            // error callback
                                            function (e) {
