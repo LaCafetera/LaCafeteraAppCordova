@@ -108,9 +108,6 @@ function onDeviceReady() {
         var pos_reproduccion;
         var tipoEmision;
 
-        $("#barra_reprod").find('input').hide();
-        $("#barra_reprod").find('input').css('margin-left','15px'); // Fix for some FF versions
-        $("#barra_reprod").find('.ui-slider-track').css('margin','0 15px 0 15px');
         $('#slider-descarga').hide();
 
         function numerosDosCifras( numero) {
@@ -269,8 +266,13 @@ function onDeviceReady() {
             }); //final getJSON (chat)
         }); // final click episodio
 
-        $( "#slider-rep" ).on( 'slidestart', function(event) {alert ("kietorrla")} );
-        $( "#slider-rep" ).on( 'slidestop', function(event) {alert ("kietorrl")} );
+
+        $('#barra_reprod').append("<input type=\"range\" name=\"slider-rep\" id=\"slider-rep\" value=\"0\" min=\"0\" max=\"100\" data-highlight=\"true\" type=\"range\" align=\"center\" data-mini=\"true\">");
+        $("#barra_reprod").find('input').hide();
+        $("#barra_reprod").find('input').css('margin-left','15px'); // Fix for some FF versions
+        $("#barra_reprod").change(function() {
+                                                reproductor.seekTo((reproductor.getDuration() * 1000 * document.getElementById("slider-rep").value)/100);
+                                             });
 
         $("#descarga").click(function(){
             episodio_id = elementos[posicion].episode_id;
@@ -355,7 +357,6 @@ function onDeviceReady() {
                                                 if (position > -1) {
                                                     var posicion = dameTiempo(Math.round(position));
                                                     console.log ("Reproductor por " + posicion);
-                                                    //$("#slider-rep").closest(".ui-slider").find(".ui-slider-handle").text(posicion);
                                                     $("#slider-rep-lab").html(posicion);
                                                 }
                                            },
