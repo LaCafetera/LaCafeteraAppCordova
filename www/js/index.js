@@ -102,6 +102,7 @@ function onDeviceReady() {
         var reproductor;
         var reproduciendo=0;
         var descargando = false;
+        var descargado = false;
         var titulo ;
         var fileTransfer;// = new FileTransfer();
         var pos_reproduccion;
@@ -132,6 +133,22 @@ function onDeviceReady() {
             return (numerosDosCifras (horas) + ':' + numerosDosCifras (minutos) + ':' + numerosDosCifras (segundos));
         }
 
+        function borrarDescarga (fichero) {
+            window.resolveLocalFileSystemURL(cordova.file.dataDirectory, function(fileSystem) {
+            	fileSystem.getFile(fichero, {create:false}, function(fileEntry) {
+                    fileEntry.remove(function(){
+                        alert("La descarga se ha borrado");
+                        console.log ("La descarga se ha borrado");
+                    },function(error){
+                        alert("Error borrando descarga: " + error);
+                        console.log ("Error borrando descarga. Fichero: " + fichero +"; error: " + error);
+                    },function(){
+                        alert("No encuentro el fichero. :-S");
+                    });
+            	});
+            });
+        }
+
 
         function inicializaReproductor(fichero){
             window.resolveLocalFileSystemURL(cordova.file.dataDirectory, function(fileSystem){
@@ -139,16 +156,33 @@ function onDeviceReady() {
             }, getFSFail); //of requestFileSystem
         }
         function fileExists(fileEntry){
+            console.log("El fichero existe. Reproduciremos fichero local")
+            console.log("Reproductor:" + reproductor);
+            if (typeof(reproductor) != 'undefined'){
+                reproductor.release();
+            }
             $("#descarga").removeClass("ui-icon-arrow-d ui-icon-cloud").addClass("ui-icon-cloud");
             reproductor = new Media(encodeURI(fichero_en_rep), function(){console.log("comenzando reproduccion fichero local")},
                                                              function(err){console.log("Error en reproduccion" + err.code)},
                                                              function(msg){reproduciendo = msg});
+             descargado = true;
         }
         function fileDoesNotExist(){
+            console.log("El fichero NO existe. Reproduciremos por streaming")
             $("#descarga").removeClass("ui-icon-arrow-d ui-icon-cloud").addClass("ui-icon-arrow-d");
+            console.log("Reproductor:" + reproductor);
+            if (typeof(reproductor) != 'undefined'){
+                reproductor.release();
+                console.log ("Eliminando instancia de reproductor");
+            }
+            else
+            {
+                console.log ("No se elimina la instancia de reproductor");
+            }
             reproductor = new Media(encodeURI(audio_en_rep), function(){console.log("comenzando reproduccion streaming")},
                                                              function(err){console.log("Error en reproduccion" + err.code)},
                                                              function(msg){reproduciendo = msg});
+            descargado = false;
         }
         function getFSFail(evt) {
             console.log(evt.target.error.code);
@@ -193,6 +227,7 @@ function onDeviceReady() {
                 var elementosCapitulo = data.response.episode;
                 var fecha = new Date (elementosCapitulo.published_at);
                 dias = Math.floor((ahora - fecha.getTime())/milisegundosPorDia);
+                console.log ("Calculando cuántos días es " + (ahora - fecha.getTime())/milisegundosPorDia);
                 if (dias == 1) {
                     cadenaDias = "Hace 1 dia"
                 }
@@ -200,9 +235,7 @@ function onDeviceReady() {
                     cadenaDias = "Hace " + dias + " dias"
                 }
                 $("#imagen2").html("<img align=center src="+elementosCapitulo.image_url+" >");
-                //$("#tituloPag2").html("<p><h2 align=\"center\">"+ elementosCapitulo.title + "</h2></p><p><h3 align=\"center\">"+ elementosCapitulo.published_at + "</h3></p>");
                 $("#tituloPag2").html("<p><h2 align=\"center\">"+ elementosCapitulo.title + "</h2></p><p><h3 align=\"center\">"+ cadenaDias + "</h3></p>");
-           //     $("#fechaEmision").html("");
                 audio_en_rep = "https://api.spreaker.com/listen/episode/"+episodio_id+"/http";
                 fichero_en_rep = cordova.file.dataDirectory + episodio_id + ".mp3";
                 inicializaReproductor (episodio_id + ".mp3");
@@ -230,7 +263,6 @@ function onDeviceReady() {
                     cadena += "<tr><td><img src="+imagenAutor+" width=\"50\" height=\"50\"></td>"+
                              "<td style=\"background-color:#ccc; margin:5px\"><b>" + val.author_fullname + "</b> ("+ val.created_at + ")" + //"<p class=\"ui-li-aside ui-li-count\">" + val.created_at + "</p>" +
                              "<p>" + val.text +"</p></td></tr>";
-                    //$("#Chat").append(cadena);
                 }); // fin de forEach
                 $('<table>').attr({'data-role':'table','class':'ui-responsive table-stroke table-stripe',id:'tablaChat'}).html(cadenaIni+cadena+cadenaFin).appendTo("#Chat");
                 $("#tablaChat").table().table("refresh");
@@ -245,51 +277,61 @@ function onDeviceReady() {
             var audio_en_desc = "https://api.spreaker.com/download/episode/"+episodio_id+"/.mp3";
             var uri = encodeURI(audio_en_desc);
             var fileURL =  cordova.file.dataDirectory + episodio_id + ".mp3";
-            if (!descargando) {
-                fileTransfer = new FileTransfer();
+            if (descargado == false){
+                if (!descargando) {
+                    fileTransfer = new FileTransfer();
+                }
+                fileTransfer.onprogress = function(progressEvent) {
+                    if (progressEvent.lengthComputable) {
+                        var perc = Math.floor(progressEvent.loaded / progressEvent.total * 100);
+                        document.getElementById("slider-descarga").value = perc;
+                    }
+                }; // fin onprogress
+
+                if (!descargando){
+                    descargando = true;
+                    console.log("Comenzando la descarga del fichero "+ enlaceEpisodio);
+                    document.getElementById("slider-descarga").value = 0;
+                    $('#slider-descarga').show();
+
+                    //document.getElementById("barra_descarga").style.display = 'block';
+
+                    fileTransfer.download( uri, fileURL,
+                        function(entry) {
+                            alert("Descargarga completa.");
+                            $('#slider-descarga').hide();
+                            if (reproduciendo != Media.MEDIA_RUNNING && reproduciendo != Media.MEDIA_STARTING ){
+                                inicializaReproductor (episodio_id + ".mp3");
+                            }
+                        },
+                        function(error) {
+                            console.log("download error source " + error.source);
+                            console.log("download error target " + error.target);
+                            console.log("download error code" + error.code);
+                            // ESto lo pongo aquí porque cuando cancelo la descarga la ejecución pasa por aquí. Así nos aseguramos de verdad de que la descarga ha terminado.
+                            descargando = false;
+                            $('#slider-descarga').hide();
+                        },
+                        false, {
+                            headers: {
+                                "Authorization": "Basic dGVzdHVzZXJuYW1lOnRlc3RwYXNzd29yZA=="
+                            }
+                        })
+                }
+                else {
+                    fileTransfer.abort();
+                    console.log("Abortando descarga");
+                }
             }
-            fileTransfer.onprogress = function(progressEvent) {
-                if (progressEvent.lengthComputable) {
-            	    var perc = Math.floor(progressEvent.loaded / progressEvent.total * 100);
-            		//$("#slider-descarga").val(perc).slider("refresh");
-                    //$("#slider-descarga").closest(".ui-slider").find(".ui-slider-handle").text(perc+"%");
-                    document.getElementById("slider-descarga").value = perc;
-            	}
-            }; // fin onprogress
-
-            if (!descargando){
-                descargando = true;
-                console.log("Comenzando la descarga del fichero "+ enlaceEpisodio);
-                document.getElementById("slider-descarga").value = 0;
-                $('#slider-descarga').show();
-
-                //document.getElementById("barra_descarga").style.display = 'block';
-
-                fileTransfer.download( uri, fileURL,
-                    function(entry) {
-                        alert("Descargarga completa.");
-                        $('#slider-descarga').hide();
-                        inicializaReproductor (episodio_id + ".mp3");
-                    },
-                    function(error) {
-                        console.log("download error source " + error.source);
-                        console.log("download error target " + error.target);
-                        console.log("download error code" + error.code);
-                        // ESto lo pongo aquí porque cuando cancelo la descarga la ejecución pasa por aquí. Así nos aseguramos de verdad de que la descarga ha terminado.
-                        descargando = false;
-                        //$("#slider-descarga").closest(".ui-slider").find(".ui-slider-handle").text("0 %");
-                        //document.getElementById("barra_descarga").style.display = 'none';
-                        $('#slider-descarga').hide();
-                    },
-                    false, {
-                        headers: {
-                            "Authorization": "Basic dGVzdHVzZXJuYW1lOnRlc3RwYXNzd29yZA=="
-                        }
-                    })
-            }
-            else {
-                fileTransfer.abort();
-                console.log("Abortando descarga");
+            else // El usuario da al botón de descarga cuando el fichero ya había sido descargado.
+            {
+                if (confirm('El fichero ya ha sido descargado. \n ¿Desea borrarlo?')) {
+                    borrarDescarga(episodio_id + ".mp3");
+                    reproductor.stop();
+                    inicializaReproductor (episodio_id + ".mp3");
+                } else {
+                    console.log("Rechazada opción de borrado.")
+                }
             }
         }); //fin ("#descarga").click
 
@@ -298,7 +340,6 @@ function onDeviceReady() {
             console.log ("Estado rep "  + reproduciendo);
             if (reproduciendo == Media.MEDIA_RUNNING || reproduciendo == Media.MEDIA_STARTING ) {
                 reproductor.pause();
-               // $("#buttonPlay").html("Play") ;
                 reproduciendo = false;
                 clearInterval(pos_reproduccion);
             } else {
@@ -314,7 +355,7 @@ function onDeviceReady() {
                                                 if (position > -1) {
                                                     var posicion = dameTiempo(Math.round(position));
                                                     console.log ("Reproductor por " + posicion);
-                                                    $("#slider-rep").closest(".ui-slider").find(".ui-slider-handle").text(posicion);
+                                                    //$("#slider-rep").closest(".ui-slider").find(".ui-slider-handle").text(posicion);
                                                     $("#slider-rep-lab").html(posicion);
                                                 }
                                            },
