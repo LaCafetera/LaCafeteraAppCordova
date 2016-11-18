@@ -51,6 +51,8 @@ var app = {
 app.initialize(); */
 document.addEventListener("deviceready", onDeviceReady, false);
 
+var hashtag = "";
+
 function onDeviceReady() {
    console.log(FileTransfer);
    console.log(Media);
@@ -162,6 +164,7 @@ function onDeviceReady() {
             reproductor = new Media(encodeURI(fichero_en_rep), function(){console.log("comenzando reproduccion fichero local")},
                                                              function(err){console.log("Error en reproduccion" + err.code)},
                                                              function(msg){reproduciendo = msg});
+             $("#slider-rep").attr("max", "1");
              descargado = true;
         }
         function fileDoesNotExist(){
@@ -177,8 +180,9 @@ function onDeviceReady() {
                 console.log ("No se elimina la instancia de reproductor");
             }
             reproductor = new Media(encodeURI(audio_en_rep), function(){console.log("comenzando reproduccion streaming")},
-                                                             function(err){console.log("Error en reproduccion" + err.code)},
+                                                             function(err){console.log("Error en reproduccion: " + err.code); alert ("Error reproduciendo: " + err.code)},
                                                              function(msg){reproduciendo = msg});
+            $("#slider-rep").attr("max", "1");
             descargado = false;
         }
         function getFSFail(evt) {
@@ -235,6 +239,20 @@ function onDeviceReady() {
                 $("#tituloPag2").html("<p><h2 align=\"center\">"+ elementosCapitulo.title + "</h2></p><p><h3 align=\"center\">"+ cadenaDias + "</h3></p>");
                 audio_en_rep = "https://api.spreaker.com/listen/episode/"+episodio_id+"/http";
                 fichero_en_rep = cordova.file.dataDirectory + episodio_id + ".mp3";
+                var posHT = elementosCapitulo.title.indexOf('#');
+                if (posHT != -1){
+                    var espacio = elementosCapitulo.title.indexOf(' ', posHT);
+                    if (espacio == -1) {
+                        espacio = elementosCapitulo.title.length;
+                    }
+                    var resta = elementosCapitulo.title.indexOf(' ', posHT)-posHT;
+                    hashtag = elementosCapitulo.title.substr(posHT, espacio) + " ";
+                    console.log("El hashtag es " + hashtag + " La posición del caracter # es " + posHT + " espacio " + espacio + " resta " + resta);
+                }
+                else
+                {
+                    console.log("Sin hashtag en el titulo");
+                }
                 inicializaReproductor (episodio_id + ".mp3");
                 titulo = elementosCapitulo.title;
                 imagen = elementosCapitulo.image_url.replace("\/","/");
@@ -261,8 +279,8 @@ function onDeviceReady() {
                              "<td style=\"background-color:#ccc; margin:5px\"><b>" + val.author_fullname + "</b> ("+ val.created_at + ")" + //"<p class=\"ui-li-aside ui-li-count\">" + val.created_at + "</p>" +
                              "<p>" + val.text +"</p></td></tr>";
                 }); // fin de forEach
-                $('<table>').attr({'data-role':'table','class':'ui-responsive table-stroke table-stripe',id:'tablaChat'}).html(cadenaIni+cadena+cadenaFin).appendTo("#Chat");
-                $("#tablaChat").table().table("refresh");
+                $('<table>').attr({'data-role':'table','class':'ui-responsive table-stroke table-stripe','id':'tablaChat'}).html(cadenaIni+cadena+cadenaFin).appendTo("#Chat");
+                $("#tablaChat").table("refresh"); //TODO: Esto no funciona.
             }); //final getJSON (chat)
         }); // final click episodio
 
@@ -271,7 +289,9 @@ function onDeviceReady() {
         $("#barra_reprod").find('input').hide();
         $("#barra_reprod").find('input').css('margin-left','15px'); // Fix for some FF versions
         $("#barra_reprod").change(function() {
-                                                reproductor.seekTo((reproductor.getDuration() * 1000 * document.getElementById("slider-rep").value)/100);
+                                                //reproductor.seekTo((reproductor.getDuration() * 1000 * document.getElementById("slider-rep").value)/100);
+                                                reproductor.seekTo($("#slider-rep").val()*1000);
+                                                console.log("Ha cambiado la posición del slider." + $("#slider-rep").val())
                                              });
 
         $("#descarga").click(function(){
@@ -354,10 +374,18 @@ function onDeviceReady() {
                                        reproductor.getCurrentPosition(
                                            // success callback
                                            function (position) {
-                                                if (position > -1) {
+                                                if (position > -1 && reproduciendo == Media.MEDIA_RUNNING) {
                                                     var posicion = dameTiempo(Math.round(position));
-                                                    console.log ("Reproductor por " + posicion);
+                                                    console.log ("Reproductor por " + posicion + " (" + Math.round(position) + ")");
                                                     $("#slider-rep-lab").html(posicion);
+                                                    if ($("#slider-rep").attr("max")==1)
+                                                    {
+                                                        console.log("reproduciendo: "+ reproduciendo + " longitud: " + reproductor.getDuration());
+                                                        $("#slider-rep").attr("max", Math.floor(reproductor.getDuration()));
+                                                        console.log("El valor máximo del slider es "+ $("#slider-rep").attr("max") + " y debería ser " + Math.floor(reproductor.getDuration()));
+                                                    }
+                                                    // ESta línea tiene que estar aquí abajo, para que refresque el valor máximo de la barra antes de que cambiemos el valor.
+                                                    $("#slider-rep").val(Math.round(position)).slider("refresh");
                                                 }
                                            },
                                            // error callback
@@ -401,5 +429,10 @@ function onDeviceReady() {
 
         $("#buttonChat").click(function(){
             alert ("Chateando que es gerundio.");
+        });
+
+        $("#chatTwit").click(function(){
+            console.log ("Twiteando mensaje \"" + hashtag + $("#mensaje").val() + "\"");
+            window.plugins.socialsharing.shareViaTwitter(hashtag + $("#mensaje").val());
         });
     }
