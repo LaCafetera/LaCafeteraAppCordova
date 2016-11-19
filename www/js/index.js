@@ -99,6 +99,7 @@ function onDeviceReady() {
         var elementos;
         var audio_en_rep="0";
         var fichero_en_rep = "";
+        var audioActual = "";
         var enlace = "";
         var posicion=0;
         var reproductor;
@@ -106,7 +107,7 @@ function onDeviceReady() {
         var descargando = false;
         var descargado = false;
         var titulo ;
-        var fileTransfer;// = new FileTransfer();
+        var fileTransfer;
         var pos_reproduccion;
         var tipoEmision;
 
@@ -125,6 +126,12 @@ function onDeviceReady() {
             return (ret);
         }
 
+        function sleep(milisegundos) {
+          console.log('Comenzando espera...');
+          setTimeout(function(){ console.log("Hemos esperado " + milisegundos / 1000 + "segundos"); }, milisegundos);
+          console.log('Terminada espera...');
+        }
+
         function dameTiempo(totSegundos){
             var horas = Math.floor(totSegundos / 3600);
             var minutos = Math.floor((totSegundos % 3600) / 60);
@@ -133,6 +140,7 @@ function onDeviceReady() {
         }
 
         function borrarDescarga (fichero) {
+            console.log("Borrando fichero " + fichero + " de carpeta " + cordova.file.dataDirectory);
             window.resolveLocalFileSystemURL(cordova.file.dataDirectory, function(fileSystem) {
             	fileSystem.getFile(fichero, {create:false}, function(fileEntry) {
                     fileEntry.remove(function(){
@@ -150,6 +158,7 @@ function onDeviceReady() {
 
 
         function inicializaReproductor(fichero){
+            console.log ("Vamos a ver si existe el fichero " + fichero + " de la carpeta " + cordova.file.dataDirectory);
             window.resolveLocalFileSystemURL(cordova.file.dataDirectory, function(fileSystem){
                 fileSystem.getFile(fichero, { create: false }, fileExists, fileDoesNotExist);
             }, getFSFail); //of requestFileSystem
@@ -165,6 +174,7 @@ function onDeviceReady() {
                                                              function(err){console.log("Error en reproduccion" + err.code)},
                                                              function(msg){reproduciendo = msg});
              $("#slider-rep").attr("max", "1");
+                reproductor.play();
              descargado = true;
         }
         function fileDoesNotExist(){
@@ -183,6 +193,7 @@ function onDeviceReady() {
                                                              function(err){console.log("Error en reproduccion: " + err.code); alert ("Error reproduciendo: " + err.code)},
                                                              function(msg){reproduciendo = msg});
             $("#slider-rep").attr("max", "1");
+                reproductor.play();
             descargado = false;
         }
         function getFSFail(evt) {
@@ -246,14 +257,14 @@ function onDeviceReady() {
                         espacio = elementosCapitulo.title.length;
                     }
                     var resta = elementosCapitulo.title.indexOf(' ', posHT)-posHT;
-                    hashtag = elementosCapitulo.title.substr(posHT, espacio) + " ";
+                    hashtag = elementosCapitulo.title.substring(posHT, espacio) + " ";
                     console.log("El hashtag es " + hashtag + " La posición del caracter # es " + posHT + " espacio " + espacio + " resta " + resta);
                 }
                 else
                 {
                     console.log("Sin hashtag en el titulo");
                 }
-                inicializaReproductor (episodio_id + ".mp3");
+                //inicializaReproductor (episodio_id + ".mp3");
                 titulo = elementosCapitulo.title;
                 imagen = elementosCapitulo.image_url.replace("\/","/");
                 enlaceEpisodio = "https://www.spreaker.com/episode/"+episodio_id;
@@ -277,7 +288,7 @@ function onDeviceReady() {
                     }
                     cadena += "<tr><td><img src="+imagenAutor+" width=\"50\" height=\"50\"></td>"+
                              "<td style=\"background-color:#ccc; margin:5px\"><b>" + val.author_fullname + "</b> ("+ val.created_at + ")" + //"<p class=\"ui-li-aside ui-li-count\">" + val.created_at + "</p>" +
-                             "<p>" + val.text +"</p></td></tr>";
+                             "<p><h5>" + val.text +"</h5></p></td></tr>";
                 }); // fin de forEach
                 $('<table>').attr({'data-role':'table','class':'ui-responsive table-stroke table-stripe','id':'tablaChat'}).html(cadenaIni+cadena+cadenaFin).appendTo("#Chat");
                 $("#tablaChat").table("refresh"); //TODO: Esto no funciona.
@@ -312,7 +323,7 @@ function onDeviceReady() {
 
                 if (!descargando){
                     descargando = true;
-                    console.log("Comenzando la descarga del fichero "+ enlaceEpisodio);
+                    console.log("Comenzando la descarga del fichero "+ episodio_id + " en la carpeta " + cordova.file.dataDirectory );
                     document.getElementById("slider-descarga").value = 0;
                     $('#slider-descarga').show();
 
@@ -348,9 +359,9 @@ function onDeviceReady() {
             else // El usuario da al botón de descarga cuando el fichero ya había sido descargado.
             {
                 if (confirm('El fichero ya ha sido descargado. \n ¿Desea borrarlo?')) {
-                    borrarDescarga(episodio_id + ".mp3");
                     reproductor.stop();
-                    inicializaReproductor (episodio_id + ".mp3");
+                    borrarDescarga(episodio_id + ".mp3");
+                    //inicializaReproductor (episodio_id + ".mp3");
                 } else {
                     console.log("Rechazada opción de borrado.")
                 }
@@ -359,42 +370,75 @@ function onDeviceReady() {
 
 
         $("#buttonPlay").click(function(){
-            console.log ("Estado rep "  + reproduciendo);
-            if (reproduciendo == Media.MEDIA_RUNNING || reproduciendo == Media.MEDIA_STARTING ) {
-                reproductor.pause();
-                reproduciendo = false;
-                clearInterval(pos_reproduccion);
-            } else {
-                if (tipoEmision == "LIVE") {
-                    reproductor.seek(reproductor.getDuration()*1000);
+            console.log ("Estado rep "  + reproduciendo + " Ahora mismo reproduciendo "+ audioActual + " y queriendo reproducir " + episodio_id);
+            if (audioActual == episodio_id) { // Si no cambio de programa entonces...
+                if (reproduciendo == Media.MEDIA_RUNNING || reproduciendo == Media.MEDIA_STARTING ) {
+                    reproductor.pause();
+                    reproduciendo = false;
+                    clearInterval(pos_reproduccion);
                 }
-                reproductor.play();
-                pos_reproduccion = setInterval(function () {
-                                       // get media position
-                                       reproductor.getCurrentPosition(
-                                           // success callback
-                                           function (position) {
-                                                if (position > -1 && reproduciendo == Media.MEDIA_RUNNING) {
-                                                    var posicion = dameTiempo(Math.round(position));
-                                                    console.log ("Reproductor por " + posicion + " (" + Math.round(position) + ")");
-                                                    $("#slider-rep-lab").html(posicion);
-                                                    if ($("#slider-rep").attr("max")==1)
-                                                    {
-                                                        console.log("reproduciendo: "+ reproduciendo + " longitud: " + reproductor.getDuration());
-                                                        $("#slider-rep").attr("max", Math.floor(reproductor.getDuration()));
-                                                        console.log("El valor máximo del slider es "+ $("#slider-rep").attr("max") + " y debería ser " + Math.floor(reproductor.getDuration()));
+                else {
+                    if (tipoEmision == "LIVE") {
+                        reproductor.seek(reproductor.getDuration()*1000);
+                    }
+                    reproductor.play();
+                    pos_reproduccion = setInterval(function () {
+                                           // get media position
+                                           reproductor.getCurrentPosition(
+                                               // success callback
+                                               function (position) {
+                                                    if (position > -1 && reproduciendo == Media.MEDIA_RUNNING) {
+                                                        var posicion = dameTiempo(Math.round(position));
+                                                        console.log ("Reproductor por " + posicion + " (" + Math.round(position) + ")");
+                                                        $("#slider-rep-lab").html(posicion);
+                                                        if ($("#slider-rep").attr("max")==1)
+                                                        {
+                                                            console.log("reproduciendo: "+ reproduciendo + " longitud: " + reproductor.getDuration());
+                                                            $("#slider-rep").attr("max", Math.floor(reproductor.getDuration()));
+                                                            console.log("El valor máximo del slider es "+ $("#slider-rep").attr("max") + " y debería ser " + Math.floor(reproductor.getDuration()));
+                                                        }
+                                                        // ESta línea tiene que estar aquí abajo, para que refresque el valor máximo de la barra antes de que cambiemos el valor.
+                                                        $("#slider-rep").val(Math.round(position)).slider("refresh");
                                                     }
-                                                    // ESta línea tiene que estar aquí abajo, para que refresque el valor máximo de la barra antes de que cambiemos el valor.
-                                                    $("#slider-rep").val(Math.round(position)).slider("refresh");
-                                                }
-                                           },
-                                           // error callback
-                                           function (e) {
-                                               console.log("Error getting pos=" + e);
-                                           }
-                                       );
-                                   }, 1000);
-               // $("#buttonPlay").html("Pausa") ;
+                                               },
+                                               // error callback
+                                               function (e) {
+                                                   console.log("Error getting pos=" + e);
+                                               }
+                                           );
+                                       }, 1000);
+                }
+            }
+            else // Y si sí he cambiado de programa, entonces...
+            {
+                audioActual = episodio_id;
+                inicializaReproductor (episodio_id + ".mp3");
+                //reproductor.play();
+                pos_reproduccion = setInterval(function () {
+                                    // get media position
+                                    reproductor.getCurrentPosition(
+                                        // success callback
+                                        function (position) {
+                                             if (position > -1 && reproduciendo == Media.MEDIA_RUNNING) {
+                                                 var posicion = dameTiempo(Math.round(position));
+                                                 console.log ("Reproductor por " + posicion + " (" + Math.round(position) + ")");
+                                                 $("#slider-rep-lab").html(posicion);
+                                                 if ($("#slider-rep").attr("max")==1)
+                                                 {
+                                                     console.log("reproduciendo: "+ reproduciendo + " longitud: " + reproductor.getDuration());
+                                                     $("#slider-rep").attr("max", Math.floor(reproductor.getDuration()));
+                                                     console.log("El valor máximo del slider es "+ $("#slider-rep").attr("max") + " y debería ser " + Math.floor(reproductor.getDuration()));
+                                                 }
+                                                 // ESta línea tiene que estar aquí abajo, para que refresque el valor máximo de la barra antes de que cambiemos el valor.
+                                                 $("#slider-rep").val(Math.round(position)).slider("refresh");
+                                             }
+                                        },
+                                        // error callback
+                                        function (e) {
+                                            console.log("Error getting pos=" + e);
+                                        }
+                                    );
+                                }, 1000);
             }
         }); //fin buttonPlay.click
 
