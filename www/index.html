@@ -1,6 +1,6 @@
 <html>
 <head>
-	<!--
+    <!--
     Customize this policy to fit your own app's needs. For more guidance, see:
         https://github.com/apache/cordova-plugin-whitelist/blob/master/README.md#content-security-policy
     Some notes:
@@ -10,14 +10,15 @@
             * Enable inline JS: add 'unsafe-inline' to default-src
 
     <meta http-equiv="Content-Security-Policy" content="default-src &apos;self&apos; data: gap: https://ssl.gstatic.com &apos;unsafe-eval&apos;; style-src &apos;self&apos; &apos;unsafe-inline&apos;; media-src *">
-    -->    <meta name="format-detection" content="telephone=no">
+    -->    <meta name="format-detection" content="telephone=yes">
 
-	<meta name="msapplication-tap-highlight" content="no">
-	<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
 
-	<link rel="stylesheet" type="text/css" href="js/jquery-1.5.0.mobile.min.css">
-	<link rel="stylesheet" type="text/css" href="css/index.css">
-	<style>
+    <link rel="stylesheet" type="text/css" href="js/jquery-1.5.0.mobile.min.css">
+    <link rel="stylesheet" type="text/css" href="css/index.css">
+    <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/3.15/themes/css/cartodb.css" />
+    <style>
 		/* For avoiding title truncation in wp8 */
 		.ui-header .ui-title {
 				overflow: visible !important;
@@ -29,7 +30,7 @@
 				position: relative !important;
 		}
 		</style>
-	<title>La Cafetera</title>
+    <title>La Cafetera</title>
 </head>
 
 <body>
@@ -37,86 +38,87 @@
 <!----------------------------------------- Página 1a (listado capítulos). --------------------------------------------------->
 
 <div data-role="page" id="capitulos">
-	<div data-role="header" class="cabecera" data-position="fixed"> <!--  style="background-color:#444444;" > -->
-		<h1> La Cafetera de Radiocable</h1>
-		<img class="logo" src="img/cafetera.png" />
-	</div>
+    <div data-role="header" class="cabecera" data-position="fixed"> <!--  style="background-color:#444444;" > -->
+        <h1> La Cafetera de Radiocable</h1>
+        <img class="logo" src="img/cafetera.png" />
+    </div>
 
-	<div data-role="main" class="ui-content">
-		<div data-role="navbar">
-			<ul>
-				<li><a href="#" class="ui-btn-active ui-state-persist">PISTAS</a></li>
-				<li><a href="#pinfoFer">INFO</a></li>
-			</ul>
-		</div>
-		<div data-role="content">
-			<div id="capitulos">
-				<ul data-role="listview" class = "my-new-list" id= "listado"></ul>
-			</div>
-		</div>
-	</div>
+    <div data-role="main" class="ui-content">
+        <div data-role="navbar">
+            <ul>
+                <li><a href="#" class="ui-btn-active ui-state-persist">PISTAS</a></li>
+                <li><a href="#pinfoFer">INFO</a></li>
+            </ul>
+        </div>
+        <div data-role="content">
+            <div id="listacapitulos">
+                <ul data-role="listview" class = "my-new-list" id= "listado"></ul>
+            </div>
+        </div>
+    </div>
 </div>
 <!----------------------------------------- Página 1b (info Fernando). --------------------------------------------------->
+<style>
+      html, body, #map {
+        height: 60%;
+        padding: 0;
+        margin: 0;
+      }
+    </style>
 
 <div data-role="page" id="pinfoFer">
-	<div data-role="header" class="cabecera" data-position="fixed"> <!--  style="background-color:#444444;" > -->
-		<h1> La Cafetera de Radiocable</h1>
-		<img class="logo" src="img/cafetera.png" />
-	</div>
+    <div data-role="header" class="cabecera" data-position="fixed"> <!--  style="background-color:#444444;" > -->
+        <h1> La Cafetera de Radiocable</h1>
+        <img class="logo" src="img/cafetera.png" />
+    </div>
+    <div data-role="main" class="ui-content">
+        <div data-role="navbar">
+            <ul>
+                <li><a href="#capitulos" >PISTAS</a></li>
+                <li><a href="#" class="ui-btn-active ui-state-persist">INFO</a></li>
+            </ul>
+        </div>
+        <div data-role="content">
+            <ul data-role="listview" class = "my-new-list" id="fberlin"></ul>
+            <div data-role="content">
+                <p>LaCafetera de <a href="www.radiocable.com">radiocable.com</a>. Dirige Fernando Berl&iacute;n</p>
+                <p>Programa de radio en directo y en diferido.</p>
+                <p>Pionera emisora de radio por internet. Naci&oacute; el 14 de mayo de 1.997 emitiendo desde un domicilio. Premio Ondas y del Club internacional de prensa.</p>
+                <a href='https://play.google.com/store/apps/details?id=com.spreaker.custom.prod.app_6243'><img src="./js/images/google-play-icon.png" width="100%"></a>
+            </div>
+        </div>
+        <iframe width="100%" height="180" frameborder="0" src="https://maria9018.carto.com/viz/94a8327e-9233-11e6-b041-0e3a376473ab/embed_map" allowfullscreen webkitallowfullscreen mozallowfullscreen oallowfullscreen msallowfullscreen></iframe>
 
-	<div data-role="main" class="ui-content">
-		<div data-role="navbar">
-			<ul>
-				<li><a href="#capitulos" >PISTAS</a></li>
-				<li><a href="#" class="ui-btn-active ui-state-persist">INFO</a></li>
-			</ul>
-		</div>
-		<div data-role="content">
-			<ul data-role="listview" class = "my-new-list" id="fberlin"></ul>
-			<div data-role="content">
-				<p>LaCafetera de <a href="www.radiocable.com">radiocable.com</a>. Dirige Fernando Berlín</p>
-				<p>Programa de radio en directo y en diferido.</p>
-				<p>Pionera emisora de radio por internet. Nació el 14 de mayo de 1.997 emitiendo desde un domicilio. Premio Ondas y del Club internacional de prensa.</p>
-				<a href='https://play.google.com/store/apps/details?id=com.spreaker.custom.prod.app_6243'><img src="./js/images/google-play-icon.png"></a>
-			</div>
-		</div>
-
-	</div>
-
-</div>
+    </div>
+    <!--   <div id="map"></div>  Si lo bajas una línea, aparece-->
 </div>
 
 <!----------------------------------------- Página 2 (Capítulo en reproducción)  --------------------------------------------------->
 
 <div data-role="page" id="capitulo">
-	<div data-role="header" class="cabecera" data-position="fixed" data-add-back-btn="true"  data-theme="a">
-		<h1> La Cafetera de Radiocable</h1>
-		<!--    <div><img class="logo" src="img/cafetera.png" /></div> -->
-	</div>
-	<div data-role="content">
-		<div data-role="content" id="imagen2">
-		</div>
-
-		<div class='ui-field-contain'>
-			<fiedset data-role="controlgroup" data-type="horizontal">
-				<button class="ui-btn ui-btn-inline ui-icon-carat-r ui-shadow  ui-btn-icon-notext" id="buttonPlay"></button>
-				<button class="ui-btn ui-btn-inline ui-icon-heart ui-shadow ui-btn-icon-notext" id="buttonLike"></button>
-				<button class="ui-btn ui-btn-inline ui-icon-arrow-d ui-btn-icon-notext" id="descarga"></button>
-				<button class="ui-btn ui-btn-inline ui-icon-mail ui-btn-icon-notext" id="buttonComparte"></button>
-				<a href="#pantallaChat" class="ui-btn ui-btn-inline ui-icon-comment ui-btn-icon-notext"></a>
-			</fiedset>
-			<progress max="100" value="0" id="slider-descarga" class="progress-bar-striped" align="center">0</progress>
-		</div>
-		<div data-role="fieldcontain" id="barra_reprod" name="barra">
-			<label for="slider-rep" id="slider-rep-lab">00:00:00</label>
-			<!--<input type="range" name="slider-rep" id="slider-rep" value="0" min="0" max="100" data-highlight="true" type="range" align="center" data-mini="true">-->
-		</div>
-		<div data-role="content" id="tituloPag2"></div>
-		<div data-role="content" id="fechaEmision"></div>
-
-
-		<!--	<p><a href="#" data-role="button" data-theme="c" data-rel="back">Volver a la lista</a></p> -->
-	</div>
+    <div data-role="header" class="cabecera" data-position="fixed" data-add-back-btn="true">
+        <h1> La Cafetera de Radiocable</h1>
+    </div>
+    <div data-role="content">
+        <div data-role="content" id="imagen2"> </div>
+        <div class='ui-field-contain'>
+            <fiedset data-role="controlgroup" data-type="horizontal">
+                <button class="ui-btn ui-btn-inline ui-icon-carat-r ui-shadow  ui-btn-icon-notext" id="buttonPlay"></button>
+                <button class="ui-btn ui-btn-inline ui-icon-heart ui-shadow ui-btn-icon-notext" id="buttonLike"></button>
+                <button class="ui-btn ui-btn-inline ui-icon-arrow-d ui-btn-icon-notext" id="descarga"></button>
+                <button class="ui-btn ui-btn-inline ui-icon-mail ui-btn-icon-notext" id="buttonComparte"></button>
+                <a href="#pantallaChat" class="ui-btn ui-btn-inline ui-icon-comment ui-btn-icon-notext"></a>
+                <!--  <a href="#pantallaMapa" class="ui-btn ui-btn-inline ui-icon-comment ui-btn-icon-notext"></a>-->
+            </fiedset>
+            <progress max="100" value="0" id="slider-descarga" class="progress-bar-striped">0</progress>
+        </div>
+        <div data-role="fieldcontain" id="barra_reprod" name="barra">
+            <label for="slider-rep" id="slider-rep-lab">00:00:00</label>
+            <!--<input type="range" name="slider-rep" id="slider-rep" value="0" min="0" max="100" data-highlight="true" type="range" align="center" data-mini="true">-->
+        </div>
+        <div data-role="content" id="tituloPag2"></div>
+        <div data-role="content" id="fechaEmision"></div>
+    </div>
 </div>
 
 
@@ -124,37 +126,36 @@
 <style type="text/css">
         tr {
             border-bottom: 5px solid #FFF;
-         }
-         td {
+        }
+        #texto {
             background:url(js/images/bocadillo.png) right top;
             background-repeat:no-repeat;
             border-bottom: 5px solid #FFF;
-         }
+        }
     </style>
-<div data-role="page"id="pantallaChat">
-	<header data-role="header" class="cabecera" data-position="fixed" data-add-back-btn="true">
-		<h1> La Cafetera de Radiocable</h1>
-	</header>
-	<div data-role="main" id="Chat">
-		<!--<table data-role="table" class="ui-responsive table-stroke table-stripe" ><thead><tr><th></th><th></th></tr></thead><tbody id="Chat">-->
-		<!--</tbody></table>-->
-	</div>
-	<footer data-role="footer" data-position="fixed"> <!--  style="background-color:#444444;" > -->
-		<form>
-			<textarea name="mensaje" id="mensaje" data-inline="true" ></textarea>
-			<div class="ui-input-btn ui-btn ui-btn-inline">
-				Twitear
-				<input data-enhanced="true" value="Enhanced" type="button" id="chatTwit">
-			</div>
-		</form>
-	</footer>
+<div data-role="page" id="pantallaChat">
+    <div data-role="header" class="cabecera" data-position="fixed" data-add-back-btn="true">
+        <h1> La Cafetera de Radiocable</h1>
+    </div>
+    <div data-role="content" id="Chat">
+        <!--<table data-role="table" class="ui-responsive table-stroke table-stripe" ><thead><tr><th></th><th></th></tr></thead><tbody id="Chat">-->
+        <!--</tbody></table>-->
+    </div>
+    <footer data-role="footer" data-position="fixed"> <!--  style="background-color:#444444;" > -->
+        <form>
+            <textarea name="mensaje" id="mensaje" data-inline="true" ></textarea>
+            <div class="ui-input-btn ui-btn ui-btn-inline">
+                Twitear
+                <input data-enhanced="true" value="Enhanced" type="button" id="chatTwit">
+            </div>
+        </form>
+    </footer>
 </div>
-</body>
-<!-- end page 2 -->
+<!-- end page 4 -->
+
+
 <script type="text/javascript" src="cordova.js"></script>
-
 <script type="text/javascript" src="js/jquery-1.11.1.min.js" id="cordova-jquery"></script>
-
 <script type="text/javascript" id="jqm-trans-disable">
 		/* For having a faster transition */
 		$(document).on("mobileinit", function() {
@@ -166,6 +167,8 @@
 
 <script type="text/javascript" src="js/jquery-1.5.0.mobile.min.js"></script>
 <script type="text/javascript" src="js/index.js"></script>
+<script src="http://libs.cartocdn.com/cartodb.js/v3/3.15/cartodb.js"></script>
+
 <script type="text/javascript" id="jqm-trans-disable">
 /*inicializa();Esto para probar en navegadores pc. Lo comento porque así se ejecuta dos veces y da problemas*/
 

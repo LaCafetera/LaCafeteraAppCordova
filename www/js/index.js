@@ -57,6 +57,7 @@ function onDeviceReady() {
    console.log(FileTransfer);
    console.log(Media);
    inicializa();
+   //mapa();
 }
 
     function ficheroExiste2 (fichero){
@@ -237,9 +238,9 @@ function onDeviceReady() {
             episodio_id = elementos[posicion].episode_id;
             $.getJSON( "https://api.spreaker.com/v2/episodes/"+episodio_id, function( data ) {
                 var elementosCapitulo = data.response.episode;
-                var fecha = new Date (elementosCapitulo.published_at);
+                var fecha = new Date (elementosCapitulo.published_at.substring(0,10));
                 dias = Math.floor((ahora - fecha.getTime())/milisegundosPorDia);
-                console.log ("Calculando cuántos días es " + (ahora - fecha.getTime())/milisegundosPorDia);
+                console.log("Tratando de calcular días de "+ elementosCapitulo.published_at.substring(0,10) + ". Los días son " + dias);
                 if (dias == 1) {
                     cadenaDias = "Hace 1 dia"
                 }
@@ -273,7 +274,7 @@ function onDeviceReady() {
             });
             $.getJSON( "https://api.spreaker.com/v2/episodes/"+episodio_id+"/messages", function( dataMsg ) {
                 var items = [];
-                var cadenaIni ='<thead><tr><th></th><th></th></tr></thead><tbody id="Chat">';
+                var cadenaIni ='<thead><tr><th></th><th></th></tr></thead><tbody id=\"Chat\" >';
                 var cadena = '';
                 var cadenaFin = '</tbody>';
                 var i=0;
@@ -286,11 +287,11 @@ function onDeviceReady() {
                     else {
                         imagenAutor = val.author_image_url;
                     }
-                    cadena += "<tr><td><img src="+imagenAutor+" width=\"50\" height=\"50\"></td>"+
-                             "<td style=\"background-color:#ccc; margin:5px\"><b>" + val.author_fullname + "</b> ("+ val.created_at + ")" + //"<p class=\"ui-li-aside ui-li-count\">" + val.created_at + "</p>" +
+                    cadena += "<tr><td id=\"img\"><img src="+imagenAutor+" width=\"50\" height=\"50\"></td>"+
+                             "<td id=\"texto\" style=\"background-color:#ccc; margin:5px\"><b>" + val.author_fullname + "</b> ("+ val.created_at + ")" + //"<p class=\"ui-li-aside ui-li-count\">" + val.created_at + "</p>" +
                              "<p><h5>" + val.text +"</h5></p></td></tr>";
                 }); // fin de forEach
-                $('<table>').attr({'data-role':'table','class':'ui-responsive table-stroke table-stripe','id':'tablaChat'}).html(cadenaIni+cadena+cadenaFin).appendTo("#Chat");
+                $('<table>').attr({'data-role':'table','class':'ui-responsive table-stroke table-stripe','id':'tablaChat', 'width':'100%'}).html(cadenaIni+cadena+cadenaFin).appendTo("#Chat");
                 $("#tablaChat").table("refresh"); //TODO: Esto no funciona.
             }); //final getJSON (chat)
         }); // final click episodio
@@ -479,4 +480,46 @@ function onDeviceReady() {
             console.log ("Twiteando mensaje \"" + hashtag + $("#mensaje").val() + "\"");
             window.plugins.socialsharing.shareViaTwitter(hashtag + $("#mensaje").val());
         });
+    }
+
+    function mapa() {
+
+        var vizjson_url = 'https://jfsebastian.carto.com/api/v2/viz/9dfd6204-9517-11e6-b34f-0e233c30368f/viz.json';
+/*        cartodb.Image(vizjson_url).size(400, 300).getUrl(function(err, url) {
+          //  alert(url);
+            $("#mapa-cafetero").attr("src", url);
+         //   $("#map").html("<img alt=\"Mapa cafetero\" id=\"mapa-cafetero\" src=\"https://cartocdn-ashbu.global.ssl.fastly.net/documentation/api/v1/map/static/bbox/04430594691ff84a3fdac56259e5180b:1419270587669/-253.125,-64.01449619484472,253.125,70.0205873017406/400/300.png\">");
+        });
+*/
+    var mapid=$("#map");
+
+    cartodb.createVis(mapid, vizjson_url).error(function(mensaje) { alert(mensaje)});
+    /*
+     cartodb.createVis(mapid, 'https://jfsebastian.carto.com/api/v2/viz/9dfd6204-9517-11e6-b34f-0e233c30368f/viz.json', {
+            shareable: false,
+            title: true,
+            description: true,
+            search: false,
+            tiles_loader: true,
+            center_lat: 0,
+            center_lon: 0,
+            zoom: 2
+      })
+      .done(function(vis, layers) {
+          // layer 0 is the base layer, layer 1 is cartodb layer
+          // setInteraction is disabled by default
+          layers[1].setInteraction(true);
+          layers[1].on('featureOver', function(e, latlng, pos, data) {
+            cartodb.log.log(e, latlng, pos, data);
+          });
+          // you can get the native map to work with it
+          var map = vis.getNativeMap();
+          // now, perform any operations you need
+          // map.setZoom(3);
+          // map.panTo([50.5, 30.5]);
+      })
+      .error(function(err) {
+            console.log(err);
+      });*/
+
     }
