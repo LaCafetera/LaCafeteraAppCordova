@@ -52,11 +52,17 @@ app.initialize(); */
 document.addEventListener("deviceready", onDeviceReady, false);
 
 var hashtag = "";
+var userBerlin = 1060718;
+var userLIVE = 7883468;
 
 function onDeviceReady() {
    console.log(FileTransfer);
    console.log(Media);
    inicializa();
+   alert("20161125");
+   var alto = Math.round(screen.width / 1.8);
+   console.log("Ancho de pantalla: " + screen.width + ". Alto: " + alto);
+   $("#iframenmap").attr("height", alto);
    //mapa();
 }
 
@@ -113,6 +119,23 @@ function onDeviceReady() {
         var tipoEmision;
 
         $('#slider-descarga').hide();
+
+        $('#modonoche').on('change', function() {
+            console.log("Modo noche " + $('#modonoche').val());
+            var tema;
+            if ($('#modonoche').val()=='on'){
+                tema = 'b';
+            }
+            else
+            {
+                tema = 'a';
+            }
+            $( "#capitulos, #pinfoFer, #capitulo, #pantallaChat, #opciones" ).removeClass( "ui-page-theme-a ui-page-theme-b" ).addClass( "ui-page-theme-" + tema );
+           // $( "#ui-body-test" ).removeClass( "ui-body-a ui-body-b" ).addClass( "ui-body-" + themeClass );
+           // $( "#ui-bar-test, #ui-bar-form" ).removeClass( "ui-bar-a ui-bar-b" ).addClass( "ui-bar-" + themeClass );
+            $( ".menupinfo" ).removeClass( "ui-body-a ui-body-b" ).addClass( "ui-body-" + tema );
+           // $( ".theme" ).text( themeClass );
+        });
 
         function numerosDosCifras( numero) {
             var ret = "00";
@@ -202,7 +225,8 @@ function onDeviceReady() {
             alert("Errorrrr");
         }
 
-        $.getJSON( "https://api.spreaker.com/v2/shows/1060718/episodes", function( data ) { //?limit=15
+        $.getJSON( "https://api.spreaker.com/v2/shows/"+userBerlin+"/episodes", function( data ) { //?limit=15
+        //$.getJSON( "https://api.spreaker.com/v2/users/"+userLIVE+"/episodes", function( data ) { //?limit=15
             var items = [];
             var cadena ='';
             var i=0;
@@ -292,7 +316,7 @@ function onDeviceReady() {
                              "<p><h5>" + val.text +"</h5></p></td></tr>";
                 }); // fin de forEach
                 $('<table>').attr({'data-role':'table','class':'ui-responsive table-stroke table-stripe','id':'tablaChat', 'width':'100%'}).html(cadenaIni+cadena+cadenaFin).appendTo("#Chat");
-                $("#tablaChat").table("refresh"); //TODO: Esto no funciona.
+            //    $("#tablaChat").table("refresh"); //TODO: Esto no funciona.
             }); //final getJSON (chat)
         }); // final click episodio
 
@@ -374,13 +398,20 @@ function onDeviceReady() {
             console.log ("Estado rep "  + reproduciendo + " Ahora mismo reproduciendo "+ audioActual + " y queriendo reproducir " + episodio_id);
             if (audioActual == episodio_id) { // Si no cambio de programa entonces...
                 if (reproduciendo == Media.MEDIA_RUNNING || reproduciendo == Media.MEDIA_STARTING ) {
-                    reproductor.pause();
+                    if (tipoEmision == "LIVE") {
+                        reproductor.stop();
+                        audioActual = 0;
+                    }
+                    else {
+                        reproductor.pause();
+                    }
                     reproduciendo = false;
                     clearInterval(pos_reproduccion);
                 }
                 else {
                     if (tipoEmision == "LIVE") {
-                        reproductor.seek(reproductor.getDuration()*1000);
+                        console.log("Reproducción en vivo. Duración del audio actual: " + reproductor.getDuration());
+                        reproductor.seekTo(reproductor.getDuration()*1000);
                     }
                     reproductor.play();
                     pos_reproduccion = setInterval(function () {
@@ -443,6 +474,12 @@ function onDeviceReady() {
             }
         }); //fin buttonPlay.click
 
+        $("#pantallaChat").delegate('.episodios','click',function(){
+       // $("#pantallaChat").click(function(){
+            console.log("Refrejkando");
+            $("#tablaChat").table("refresh"); //TODO: Esto no funciona.
+        });
+
         $("#buttonComparte").click(function(){
             console.log ("Compartir es muy bonito ");
 
@@ -470,6 +507,8 @@ function onDeviceReady() {
 
         $("#buttonLike").click(function(){
             alert ("Me alegro de que te guste");
+            console.log("Refrejkando");
+            $("#tablaChat").table("refresh"); //TODO: Esto no funciona.
         });
 
         $("#buttonChat").click(function(){

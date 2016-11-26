@@ -52,11 +52,17 @@ app.initialize(); */
 document.addEventListener("deviceready", onDeviceReady, false);
 
 var hashtag = "";
+var userBerlin = 1060718;
+var userLIVE = 7883468;
 
 function onDeviceReady() {
    console.log(FileTransfer);
    console.log(Media);
    inicializa();
+   alert("20161125");
+   var alto = Math.round(screen.width / 1.8);
+   console.log("Ancho de pantalla: " + screen.width + ". Alto: " + alto);
+   $("#iframenmap").attr("height", alto);
    //mapa();
 }
 
@@ -202,7 +208,8 @@ function onDeviceReady() {
             alert("Errorrrr");
         }
 
-        $.getJSON( "https://api.spreaker.com/v2/shows/1060718/episodes", function( data ) { //?limit=15
+       // $.getJSON( "https://api.spreaker.com/v2/shows/"+userBerlin+"/episodes", function( data ) { //?limit=15
+        $.getJSON( "https://api.spreaker.com/v2/users/"+userLIVE+"/episodes", function( data ) { //?limit=15
             var items = [];
             var cadena ='';
             var i=0;
@@ -374,13 +381,20 @@ function onDeviceReady() {
             console.log ("Estado rep "  + reproduciendo + " Ahora mismo reproduciendo "+ audioActual + " y queriendo reproducir " + episodio_id);
             if (audioActual == episodio_id) { // Si no cambio de programa entonces...
                 if (reproduciendo == Media.MEDIA_RUNNING || reproduciendo == Media.MEDIA_STARTING ) {
-                    reproductor.pause();
+                    if (tipoEmision == "LIVE") {
+                        reproductor.stop();
+                        audioActual = 0;
+                    }
+                    else {
+                        reproductor.pause();
+                    }
                     reproduciendo = false;
                     clearInterval(pos_reproduccion);
                 }
                 else {
                     if (tipoEmision == "LIVE") {
-                        reproductor.seek(reproductor.getDuration()*1000);
+                        console.log("Reproducción en vivo. Duración del audio actual: " + reproductor.getDuration());
+                        reproductor.seekTo(reproductor.getDuration()*1000);
                     }
                     reproductor.play();
                     pos_reproduccion = setInterval(function () {
