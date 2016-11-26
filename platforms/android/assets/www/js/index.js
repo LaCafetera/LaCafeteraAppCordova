@@ -59,7 +59,7 @@ function onDeviceReady() {
    console.log(FileTransfer);
    console.log(Media);
    inicializa();
-   alert("20161125");
+   alert("20161126");
    var alto = Math.round(screen.width / 1.8);
    console.log("Ancho de pantalla: " + screen.width + ". Alto: " + alto);
    $("#iframenmap").attr("height", alto);
@@ -111,6 +111,9 @@ function onDeviceReady() {
         var posicion=0;
         var reproductor;
         var reproduciendo=0;
+        var repJingle;
+        var reproducJingle=0;
+        var dirJingle = "http://www.xpress.es/radiocable/audio/jingle-cafetera-tennesse.mp3";
         var descargando = false;
         var descargado = false;
         var titulo ;
@@ -119,23 +122,6 @@ function onDeviceReady() {
         var tipoEmision;
 
         $('#slider-descarga').hide();
-
-        $('#modonoche').on('change', function() {
-            console.log("Modo noche " + $('#modonoche').val());
-            var tema;
-            if ($('#modonoche').val()=='on'){
-                tema = 'b';
-            }
-            else
-            {
-                tema = 'a';
-            }
-            $( "#capitulos, #pinfoFer, #capitulo, #pantallaChat, #opciones" ).removeClass( "ui-page-theme-a ui-page-theme-b" ).addClass( "ui-page-theme-" + tema );
-           // $( "#ui-body-test" ).removeClass( "ui-body-a ui-body-b" ).addClass( "ui-body-" + themeClass );
-           // $( "#ui-bar-test, #ui-bar-form" ).removeClass( "ui-bar-a ui-bar-b" ).addClass( "ui-bar-" + themeClass );
-            $( ".menupinfo" ).removeClass( "ui-body-a ui-body-b" ).addClass( "ui-body-" + tema );
-           // $( ".theme" ).text( themeClass );
-        });
 
         function numerosDosCifras( numero) {
             var ret = "00";
@@ -179,7 +165,6 @@ function onDeviceReady() {
             	});
             });
         }
-
 
         function inicializaReproductor(fichero){
             console.log ("Vamos a ver si existe el fichero " + fichero + " de la carpeta " + cordova.file.dataDirectory);
@@ -225,15 +210,19 @@ function onDeviceReady() {
             alert("Errorrrr");
         }
 
+        repJingle = new Media(encodeURI(dirJingle), function(){console.log("comenzando reproduccion jingle Tenesee")},
+                                                    function(err){console.log("Error en reproduccion de jingle" + err.code)},
+                                                    function(msg){reproducJingle = msg});
+
         $.getJSON( "https://api.spreaker.com/v2/shows/"+userBerlin+"/episodes", function( data ) { //?limit=15
-        //$.getJSON( "https://api.spreaker.com/v2/users/"+userLIVE+"/episodes", function( data ) { //?limit=15
+       // $.getJSON( "https://api.spreaker.com/v2/users/"+userLIVE+"/episodes", function( data ) { //?limit=15
             var items = [];
             var cadena ='';
             var i=0;
             elementos = data.response.items.slice();
             $.getJSON( "https://api.spreaker.com/v2/users/"+elementos[0].author_id, function( dataUser ) {
                 var datosFB=dataUser.response.user;
-                cadena = "<li><img src="+datosFB.image_url.replace("\/","/")+">"+
+                cadena = "<li id=\"imgFer\"><img src="+datosFB.image_url.replace("\/","/")+">"+
                          "<h3>" + datosFB.fullname + "</h3>"+
                          "<p>" + datosFB.followers_count +" Followers.</p></li>";
                 $("#fberlin").html(cadena).listview().listview('refresh');
@@ -316,7 +305,7 @@ function onDeviceReady() {
                              "<p><h5>" + val.text +"</h5></p></td></tr>";
                 }); // fin de forEach
                 $('<table>').attr({'data-role':'table','class':'ui-responsive table-stroke table-stripe','id':'tablaChat', 'width':'100%'}).html(cadenaIni+cadena+cadenaFin).appendTo("#Chat");
-            //    $("#tablaChat").table("refresh"); //TODO: Esto no funciona.
+                $("#tablaChat").table("refresh"); //TODO: Esto no funciona.
             }); //final getJSON (chat)
         }); // final click episodio
 
@@ -474,12 +463,6 @@ function onDeviceReady() {
             }
         }); //fin buttonPlay.click
 
-        $("#pantallaChat").delegate('.episodios','click',function(){
-       // $("#pantallaChat").click(function(){
-            console.log("Refrejkando");
-            $("#tablaChat").table("refresh"); //TODO: Esto no funciona.
-        });
-
         $("#buttonComparte").click(function(){
             console.log ("Compartir es muy bonito ");
 
@@ -507,8 +490,6 @@ function onDeviceReady() {
 
         $("#buttonLike").click(function(){
             alert ("Me alegro de que te guste");
-            console.log("Refrejkando");
-            $("#tablaChat").table("refresh"); //TODO: Esto no funciona.
         });
 
         $("#buttonChat").click(function(){
@@ -519,6 +500,23 @@ function onDeviceReady() {
             console.log ("Twiteando mensaje \"" + hashtag + $("#mensaje").val() + "\"");
             window.plugins.socialsharing.shareViaTwitter(hashtag + $("#mensaje").val());
         });
+
+        $("#modoNoche").change(function(){
+            console.log ("Modo noche: " + ($("#modoNoche").val()));
+            var estilo = ($("#modoNoche").val()=='on')?'b':'a';
+            $( "#capitulos, #panel-Config, #pinfoFer, #capitulo, #pantallaChat" ).removeClass( "ui-page-theme-a ui-page-theme-b" ).addClass( "ui-page-theme-" + estilo );
+        })
+
+        $("#fberlin").delegate('#imgFer','click',function(){
+            if (reproducJingle == Media.MEDIA_RUNNING || reproducJingle == Media.MEDIA_STARTING ) {
+                repJingle.pause();
+            }
+            else {
+                repJingle.play();
+                alert("El grupo Java declina toda responsabilidad de la reproducción de este jingle")
+            }
+        });
+
     }
 
     function mapa() {

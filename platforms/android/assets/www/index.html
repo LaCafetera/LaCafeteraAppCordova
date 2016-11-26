@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html>
 <head>
     <!--
@@ -15,6 +14,7 @@
 
     <meta name="msapplication-tap-highlight" content="no">
     <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+
     <link rel="stylesheet" type="text/css" href="js/jquery-1.5.0.mobile.min.css">
     <link rel="stylesheet" type="text/css" href="css/index.css">
     <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/3.15/themes/css/cartodb.css" />
@@ -30,6 +30,7 @@
 				position: relative !important;
 		}
 		</style>
+    <title>La Cafetera</title>
 </head>
 
 <body>
@@ -37,14 +38,14 @@
 <!----------------------------------------- Página 1a (listado capítulos). --------------------------------------------------->
 
 <div data-role="page" id="capitulos">
-    <div data-role="header" data-position="fixed"> <!--  style="background-color:#444444;" > -->
-        <h1> La Cafetera de Radiocable1</h1>
-        <a href="#opciones" class="ui-btn ui-corner-all ui-shadow ui-btn-icon-left ui-icon-bars"></a>
+    <div data-role="header" class="cabecera" data-position="fixed"> <!--  style="background-color:#444444;" > -->
+        <h1> La Cafetera de Radiocable</h1>
+        <a href="#panel-Config" class="ui-btn ui-btn-inline ui-icon-bars ui-btn-icon-notext"></a>
         <img class="logo" src="img/cafetera.png" />
     </div>
 
     <div data-role="main" class="ui-content">
-        <div data-role="navbar" class="menupinfo">
+        <div data-role="navbar">
             <ul>
                 <li><a href="#" class="ui-btn-active ui-state-persist">PISTAS</a></li>
                 <li><a href="#pinfoFer">INFO</a></li>
@@ -56,19 +57,39 @@
             </div>
         </div>
     </div>
-    <!-- Opciones -->
-    <div data-role="panel" id="opciones" data-display="overlay" data-add-back-btn="true">
+
+
+    <div data-role="panel" id="panel-Config" data-display="overlay">
         <div data-role="content">
-            <div class="ui-field-contain">
-                <label for="flip2">Modo noche:</label>
-                <select name="flip2" id="modonoche" data-role="flipswitch">
-                    <option value="off">Off</option>
-                    <option value="on">On</option>
-                </select>
-            </div>
+            <ul data-role="listview" data-inset="true">
+                <li class="ui-field-contain">
+                    <label for="modoNoche">Modo noche</label>
+                    <select name="modoNoche" id="modoNoche" data-role="slider">
+                        <option value="off">Off</option>
+                        <option value="on">On</option>
+                    </select>
+                </li>
+                <li class="ui-field-contain">
+                    <label for="PregTonta1">Actualizar ubicación</label>
+                    <select name="PregTonta1" id="PregTonta1" data-role="slider">
+                        <option value="off">Sí</option>
+                        <option value="on">No</option>
+                    </select>
+                    </select>
+                </li>
+                <li class="ui-field-contain">
+                    <label for="PregTonta2" class="select">El mundo es:</label>
+                    <select name="PregTonta2" id="PregTonta2" data-native-menu="false">
+                        <option value="standard">Complejo</option>
+                        <option value="rush">Convulso</option>
+                        <option value="express">Redondo</option>
+                    </select>
+                </li>
+            </ul>
+            <a href="http://www.radiocable.com/suscribete-a-la-cafetera" class="ui-btn ui-btn-inline">Hazte Mecenas</a>
         </div>
     </div>
-    <!-- end Opciones -->
+
 </div>
 <!----------------------------------------- Página 1b (info Fernando). --------------------------------------------------->
 <style>
@@ -80,13 +101,12 @@
     </style>
 
 <div data-role="page" id="pinfoFer">
-    <div data-role="header" data-position="fixed"> <!--  style="background-color:#444444;" > -->
-        <h1> La Cafetera de Radiocable2</h1>
-        <a href="#opciones" class="ui-btn ui-corner-all ui-shadow ui-btn-icon-left ui-icon-bars"></a>
+    <div data-role="header" class="cabecera" data-position="fixed"> <!--  style="background-color:#444444;" > -->
+        <h1> La Cafetera de Radiocable</h1>
         <img class="logo" src="img/cafetera.png" />
     </div>
     <div data-role="main" class="ui-content">
-        <div data-role="navbar" class="menupinfo">
+        <div data-role="navbar">
             <ul>
                 <li><a href="#capitulos" >PISTAS</a></li>
                 <li><a href="#" class="ui-btn-active ui-state-persist">INFO</a></li>
@@ -95,7 +115,7 @@
         <div data-role="content">
             <ul data-role="listview" class = "my-new-list" id="fberlin"></ul>
             <div data-role="content">
-                <p>LaCafetera de <a href="www.radiocable.com">radiocable.com</a>.(20161125) Dirige Fernando Berl&iacute;n</p>
+                <p>LaCafetera de <a href="www.radiocable.com">radiocable.com</a>.(20161126) Dirige Fernando Berl&iacute;n</p>
                 <p>Programa de radio en directo y en diferido.</p>
                 <p>Pionera emisora de radio por internet. Naci&oacute; el 14 de mayo de 1.997 emitiendo desde un domicilio. Premio Ondas y del Club internacional de prensa.</p>
                 <a href='https://play.google.com/store/apps/details?id=com.spreaker.custom.prod.app_6243'><img src="./js/images/google-play-icon.png" width="100%"></a>
@@ -110,32 +130,31 @@
 <!----------------------------------------- Página 2 (Capítulo en reproducción)  --------------------------------------------------->
 
 <div data-role="page" id="capitulo">
-    <div data-role="header" data-position="fixed" data-add-back-btn="true">
-        <h1> La Cafetera de Radiocable3</h1>
+    <div data-role="header" class="cabecera" data-position="fixed" data-add-back-btn="true">
+        <h1> La Cafetera de Radiocable</h1>
     </div>
-    <div data-role="main" class="ui-content">
-        <div id="imagen2"> </div>
-        <!--<div class='ui-field-contain'>
-            <fiedset data-role="controlgroup" data-type="horizontal">
-                <button class="ui-btn ui-btn-inline ui-icon-carat-r ui-shadow ui-btn-icon-notext" id="buttonPlay"></button>
-                <button class="ui-btn ui-btn-inline ui-icon-heart ui-shadow ui-btn-icon-notext" id="buttonLike"></button>
-                <button class="ui-btn ui-btn-inline ui-icon-arrow-d ui-btn-icon-notext" id="descarga"></button>
-                <button class="ui-btn ui-btn-inline ui-icon-mail ui-btn-icon-notext" id="buttonComparte"></button>
-                <a href="#pantallaChat" class="ui-btn ui-btn-inline ui-icon-comment ui-btn-icon-notext"></a>
-                <!--  <a href="#pantallaMapa" class="ui-btn ui-btn-inline ui-icon-comment ui-btn-icon-notext"></a>-->
-        <!--   </fiedset>-->
-        <div class="ui-grid-d">
-            <div class="ui-block-a"><button class="ui-btn ui-icon-carat-r ui-shadow ui-btn-icon-notext" id="buttonPlay"></button></div>
-            <div class="ui-block-b"><button class="ui-btn ui-icon-heart ui-shadow ui-btn-icon-notext" id="buttonLike"></button></div>
-            <div class="ui-block-c"><button class="ui-btn ui-icon-arrow-d ui-btn-icon-notext" id="descarga"></button></div>
-            <div class="ui-block-d"><button class="ui-btn ui-icon-mail ui-btn-icon-notext" id="buttonComparte"></button></div>
-            <div class="ui-block-e"><a href="#pantallaChat" class="ui-btn ui-icon-comment ui-btn-icon-notext"></a></div>
+    <div data-role="content">
+        <div data-role="content" id="imagen2"> </div>
+        <!-- <div class='ui-field-contain'>
+            -<fiedset data-role="controlgroup" data-type="horizontal">
+                 <button class="ui-btn ui-btn-inline ui-icon-carat-r ui-shadow  ui-btn-icon-notext" id="buttonPlay"></button>
+                 <button class="ui-btn ui-btn-inline ui-icon-heart ui-shadow ui-btn-icon-notext" id="buttonLike"></button>
+                 <button class="ui-btn ui-btn-inline ui-icon-arrow-d ui-btn-icon-notext" id="descarga"></button>
+                 <button class="ui-btn ui-btn-inline ui-icon-mail ui-btn-icon-notext" id="buttonComparte"></button>
+                 <a href="#pantallaChat" class="ui-btn ui-btn-inline ui-icon-comment ui-btn-icon-notext"></a>
+                 <!--  <a href="#pantallaMapa" class="ui-btn ui-btn-inline ui-icon-comment ui-btn-icon-notext"></a>-->
+        <!-- </fiedset>-->
+        <div class="ui-grid-d"> <!-- botonera -->
+            <div class="ui-block-a"><button class="ui-btn ui-btn-inline ui-icon-carat-r ui-shadow  ui-btn-icon-notext" id="buttonPlay"></button></div>
+            <div class="ui-block-b"><button class="ui-btn ui-btn-inline ui-icon-heart ui-shadow ui-btn-icon-notext" id="buttonLike"></button></div>
+            <div class="ui-block-c"><button class="ui-btn ui-btn-inline ui-icon-arrow-d ui-btn-icon-notext" id="descarga"></button></div>
+            <div class="ui-block-b"><button class="ui-btn ui-btn-inline ui-icon-mail ui-btn-icon-notext" id="buttonComparte"></button></div>
+            <div class="ui-block-c"><a href="#pantallaChat" class="ui-btn ui-btn-inline ui-icon-comment ui-btn-icon-notext"></a></div>
         </div>
-            <progress max="100" value="0" id="slider-descarga" class="progress-bar-striped">0</progress>
-        </div>
+        <progress max="100" value="0" id="slider-descarga" class="progress-bar-striped">0</progress>
+        <!--   </div> -->
         <div data-role="fieldcontain" id="barra_reprod" name="barra">
             <label for="slider-rep" id="slider-rep-lab">00:00:00</label>
-            <!--<input type="range" name="slider-rep" id="slider-rep" value="0" min="0" max="100" data-highlight="true" type="range" align="center" data-mini="true">-->
         </div>
         <div data-role="content" id="tituloPag2"></div>
         <div data-role="content" id="fechaEmision"></div>
@@ -155,15 +174,14 @@
         }
     </style>
 <div data-role="page" id="pantallaChat">
-    <div data-role="header"> <!-- class="cabecera" data-position="fixed" data-add-back-btn="true">-->
-        <h1> La Cafetera de Radiocable4</h1>
-        <a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-icon-back ui-btn-icon-left ui-btn-icon-notext">Back</a>
+    <div data-role="header" class="cabecera" data-position="fixed" data-add-back-btn="true">
+        <h1> La Cafetera de Radiocable</h1>
     </div>
-    <div data-role="main" class="ui-content" id="Chat">
+    <div data-role="content" id="Chat">
         <!--<table data-role="table" class="ui-responsive table-stroke table-stripe" ><thead><tr><th></th><th></th></tr></thead><tbody id="Chat">-->
         <!--</tbody></table>-->
     </div>
-    <div data-role="footer" data-position="fixed"> <!--  style="background-color:#444444;" > -->
+    <footer data-role="footer" data-position="fixed"> <!--  style="background-color:#444444;" > -->
         <form>
             <textarea name="mensaje" id="mensaje" data-inline="true" ></textarea>
             <div class="ui-input-btn ui-btn ui-btn-inline">
@@ -171,11 +189,9 @@
                 <input data-enhanced="true" value="Enhanced" type="button" id="chatTwit">
             </div>
         </form>
-    </div>
+    </footer>
 </div>
 <!-- end page 4 -->
-
-
 
 
 <script type="text/javascript" src="cordova.js"></script>
