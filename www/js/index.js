@@ -54,12 +54,15 @@ document.addEventListener("deviceready", onDeviceReady, false);
 var hashtag = "";
 var userBerlin = 1060718;
 var userLIVE = 7883468;
+var version = "20161127";
 
 function onDeviceReady() {
    console.log(FileTransfer);
    console.log(Media);
    inicializa();
-   alert("20161126");
+   alert("Versión: " + version);
+   $.mobile.defaultPageTransition = "none";
+   $.mobile.defaultDialogTransition = "none";
    var alto = Math.round(screen.width / 1.8);
    console.log("Ancho de pantalla: " + screen.width + ". Alto: " + alto);
    $("#iframenmap").attr("height", alto);
@@ -99,6 +102,52 @@ function onDeviceReady() {
         console.log(evt.target.error.code);
         alert("Errorrrr");
         return (false);
+    }
+
+    function cuantoHace(cadena){
+        var ahora = Date.now();
+        var diferencia;
+        var cantidad;
+        var milisegundosPorSegundo = 1000;
+        var milisegundosPorMinuto = milisegundosPorSegundo * 60;
+        var milisegundosPorHora = milisegundosPorMinuto * 60;
+        var milisegundosPorDia = milisegundosPorHora * 24;
+        var milisegundosPorMes = milisegundosPorDia * 30;
+        var milisegundosPorAnyo = milisegundosPorDia * 365;
+        var fechaSegundos = new Date (cadena.substr(0,4), cadena.substr(5,2)-1, cadena.substr(8,2), cadena.substr(11,2), cadena.substr(14,2), cadena.substr(17,2));
+        //console.log(cadena + "|"+ cadena.substr(0,4)+"|"+cadena.substr(5,2)+"|"+cadena.substr(8,2)+"|"+cadena.substr(11,2)+"|"+cadena.substr(14,2)+"|"+cadena.substr(17,2)+"|");
+        var cadenaResultado = "Hace un rato";
+
+        console.log("REcibida fecha "+ cadena);
+
+        diferencia = Math.floor(ahora - fechaSegundos.getTime());
+        //console.log("FEcha 1 =" + ahora.toString() + " Fecha 2 =" + fechaSegundos.toString() + " o también  =" + fechaSegundos.getTime());
+        //console.log("diferencia = " + diferencia);
+        if (diferencia < milisegundosPorMinuto) {
+            cadenaResultado = "Hace menos de un minuto";
+        } //
+        else if (diferencia < milisegundosPorHora) {
+            cantidad = Math.floor(diferencia/milisegundosPorMinuto);
+            cadenaResultado = "Hace " + cantidad + ((cantidad==1)? " minuto.":" minutos.");
+        }
+        else if (diferencia < milisegundosPorDia) {
+            cantidad = Math.floor(diferencia/milisegundosPorHora);
+            cadenaResultado = "Hace " + cantidad + ((cantidad==1)? " hora.":" horas.");
+        }
+        else if (diferencia < milisegundosPorMes) {
+            cantidad = Math.floor(diferencia/milisegundosPorDia);
+            cadenaResultado = "Hace " + cantidad + ((cantidad==1)? " d&iacute;a.":" d&iacute;as.");
+        }
+        else if (diferencia < milisegundosPorAnyo) {
+            cantidad = Math.floor(diferencia/milisegundosPorMes);
+            cadenaResultado = "Hace " + cantidad + ((cantidad==1)? " mes.":" meses.");
+        }
+        else {
+            cantidad = Math.floor(diferencia/milisegundosPorAnyo);
+            cadenaResultado = "Hace " + cantidad + ((cantidad==1)? " a&ntilde;o.":" a&ntilde;os.");
+        }
+        console.log(cadenaResultado);
+        return (cadenaResultado);
     }
 
 
@@ -222,7 +271,7 @@ function onDeviceReady() {
             elementos = data.response.items.slice();
             $.getJSON( "https://api.spreaker.com/v2/users/"+elementos[0].author_id, function( dataUser ) {
                 var datosFB=dataUser.response.user;
-                cadena = "<li id=\"imgFer\"><img src="+datosFB.image_url.replace("\/","/")+">"+
+                cadena = "<li id=\"imgFer\"><img src="+datosFB.image_url+">"+
                          "<h3>" + datosFB.fullname + "</h3>"+
                          "<p>" + datosFB.followers_count +" Followers.</p></li>";
                 $("#fberlin").html(cadena).listview().listview('refresh');
@@ -234,7 +283,7 @@ function onDeviceReady() {
                          "<a href=\"#capitulo\">" +
                          "<img src="+val.image_url.replace("\/","/")+">"+
                          "<h3>" + val.title + "</h3>"+
-                         "<p>" + dameTiempo(Math.floor(val.duration/1000)) + "</p>"+
+                         "<p>" + dameTiempo(Math.floor(val.duration/1000)) + " - " + cuantoHace(val.published_at) + "</p>"+
                          "</a></li>";
                          //console.log(cadena);
                 $("#listado").append(cadena);
@@ -243,25 +292,12 @@ function onDeviceReady() {
         }); // fin de getJSON
 
         $("#listado").delegate('.episodios','click',function(){
-            var milisegundosPorDia = 86400000;
-            var ahora = Date.now();
-            var dias;
-            var cadenaDias;
             posicion = this.id;
             episodio_id = elementos[posicion].episode_id;
             $.getJSON( "https://api.spreaker.com/v2/episodes/"+episodio_id, function( data ) {
                 var elementosCapitulo = data.response.episode;
-                var fecha = new Date (elementosCapitulo.published_at.substring(0,10));
-                dias = Math.floor((ahora - fecha.getTime())/milisegundosPorDia);
-                console.log("Tratando de calcular días de "+ elementosCapitulo.published_at.substring(0,10) + ". Los días son " + dias);
-                if (dias == 1) {
-                    cadenaDias = "Hace 1 dia"
-                }
-                else {
-                    cadenaDias = "Hace " + dias + " dias"
-                }
                 $("#imagen2").html("<img align=center src="+elementosCapitulo.image_url+" >");
-                $("#tituloPag2").html("<p><h2 align=\"center\">"+ elementosCapitulo.title + "</h2></p><p><h3 align=\"center\">"+ cadenaDias + "</h3></p>");
+                $("#tituloPag2").html("<p><h2 align=\"center\">"+ elementosCapitulo.title + "</h2></p><p><h3 align=\"center\">"+ cuantoHace(elementosCapitulo.published_at) + "</h3></p>");
                 audio_en_rep = "https://api.spreaker.com/listen/episode/"+episodio_id+"/http";
                 fichero_en_rep = cordova.file.dataDirectory + episodio_id + ".mp3";
                 var posHT = elementosCapitulo.title.indexOf('#');
@@ -301,11 +337,12 @@ function onDeviceReady() {
                         imagenAutor = val.author_image_url;
                     }
                     cadena += "<tr><td id=\"img\"><img src="+imagenAutor+" width=\"50\" height=\"50\"></td>"+
-                             "<td id=\"texto\" style=\"background-color:#ccc; margin:5px\"><b>" + val.author_fullname + "</b> ("+ val.created_at + ")" + //"<p class=\"ui-li-aside ui-li-count\">" + val.created_at + "</p>" +
-                             "<p><h5>" + val.text +"</h5></p></td></tr>";
+                             "<td id=\"texto\" style=\"background-color:#ccc; margin:5px\"><b>" + val.author_fullname + "</b><h4><p><h5>"+ cuantoHace(val.created_at) + "</p></h4>" + //"<p class=\"ui-li-aside ui-li-count\">" + val.created_at + "</p>" +
+                             "<p>" + val.text.replace(/::/g, ": :") +"</h5></p></td></tr>";
                 }); // fin de forEach
-                $('<table>').attr({'data-role':'table','class':'ui-responsive table-stroke table-stripe','id':'tablaChat', 'width':'100%'}).html(cadenaIni+cadena+cadenaFin).appendTo("#Chat");
-                $("#tablaChat").table("refresh"); //TODO: Esto no funciona.
+                $('<table>').attr({'data-role':'table','class':'ui-responsive table-stroke table-stripe','id':'tablaChat'}).html(cadenaIni+cadena+cadenaFin).appendTo("#Chat"); //ui-responsive
+                //console.log(cadenaIni+cadena+cadenaFin);
+                //$("#tablaChat").table("refresh"); //TODO: Esto no funciona.
             }); //final getJSON (chat)
         }); // final click episodio
 
